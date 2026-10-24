@@ -1,0 +1,453 @@
+{
+ "generated": "2026-10-24",
+ "recommended": "tuned",
+ "params": {
+  "t_opt": 17.60905177456778,
+  "t_sd": 6.835016095027713,
+  "t_window": 20,
+  "p_window": 26,
+  "p_half": 81.1179405514749,
+  "pulse_min": 10.46386759496425,
+  "pulse_lag": [
+   14,
+   19
+  ],
+  "heat_tmax": 28.80297555484644,
+  "heat_window": 10,
+  "frost_tmin": -0.6870252764655467,
+  "frost_window": 7
+ },
+ "tuned": {
+  "t_opt": 17.60905177456778,
+  "t_sd": 6.835016095027713,
+  "t_window": 20,
+  "p_window": 26,
+  "p_half": 81.1179405514749,
+  "pulse_min": 10.46386759496425,
+  "pulse_lag": [
+   14,
+   19
+  ],
+  "heat_tmax": 28.80297555484644,
+  "heat_window": 10,
+  "frost_tmin": -0.6870252764655467,
+  "frost_window": 7
+ },
+ "literature": {
+  "t_opt": 13.0,
+  "t_sd": 4.0,
+  "t_window": 20,
+  "p_window": 26,
+  "p_half": 60.0,
+  "pulse_min": 20.0,
+  "pulse_lag": [
+   7,
+   16
+  ],
+  "heat_tmax": 30.0,
+  "heat_window": 10,
+  "frost_tmin": -1.0,
+  "frost_window": 7
+ },
+ "primary_metric": "comb_tol: mean temporal percentile of season x trigger, +-3 day tolerant, leave-one-year-out",
+ "metrics": {
+  "literature": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6716,
+    "hit_top10": 0.2622,
+    "hit_top20": 0.4494
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6517,
+    "hit_top10": 0.221,
+    "hit_top20": 0.3933
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.5846,
+    "hit_top10": 0.1798,
+    "hit_top20": 0.2509
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.5658,
+    "hit_top10": 0.1236,
+    "hit_top20": 0.2247
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6716,
+    "hit_top10": 0.2659,
+    "hit_top20": 0.4457
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.6522,
+    "hit_top10": 0.2247,
+    "hit_top20": 0.4157
+   }
+  },
+  "season_only": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6615,
+    "hit_top10": 0.3521,
+    "hit_top20": 0.3521
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6516,
+    "hit_top10": 0.3071,
+    "hit_top20": 0.3071
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6626,
+    "hit_top10": 0.3521,
+    "hit_top20": 0.3521
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.6535,
+    "hit_top10": 0.3071,
+    "hit_top20": 0.3109
+   }
+  },
+  "tuned_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.7095,
+    "hit_top10": 0.2996,
+    "hit_top20": 0.4831
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6995,
+    "hit_top10": 0.2697,
+    "hit_top20": 0.4307
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.6568,
+    "hit_top10": 0.2247,
+    "hit_top20": 0.3858
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.6541,
+    "hit_top10": 0.2097,
+    "hit_top20": 0.3483
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.7119,
+    "hit_top10": 0.2996,
+    "hit_top20": 0.5019
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.7016,
+    "hit_top10": 0.2921,
+    "hit_top20": 0.4532
+   }
+  },
+  "tuned_in_sample": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.7333,
+    "hit_top10": 0.3333,
+    "hit_top20": 0.5206
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.719,
+    "hit_top10": 0.3034,
+    "hit_top20": 0.4719
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.6944,
+    "hit_top10": 0.236,
+    "hit_top20": 0.4569
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.6768,
+    "hit_top10": 0.2322,
+    "hit_top20": 0.4157
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.736,
+    "hit_top10": 0.3371,
+    "hit_top20": 0.5318
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.7217,
+    "hit_top10": 0.3146,
+    "hit_top20": 0.4794
+   }
+  },
+  "tuned_loyo_wk_objective": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.7133,
+    "hit_top10": 0.2996,
+    "hit_top20": 0.4682
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.7039,
+    "hit_top10": 0.2622,
+    "hit_top20": 0.4307
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.6679,
+    "hit_top10": 0.2247,
+    "hit_top20": 0.412
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.6642,
+    "hit_top10": 0.221,
+    "hit_top20": 0.3708
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.7159,
+    "hit_top10": 0.3034,
+    "hit_top20": 0.4831
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.7064,
+    "hit_top10": 0.2809,
+    "hit_top20": 0.4457
+   }
+  },
+  "free_windows_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6851,
+    "hit_top10": 0.2509,
+    "hit_top20": 0.4419
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6699,
+    "hit_top10": 0.2322,
+    "hit_top20": 0.4045
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.6552,
+    "hit_top10": 0.2247,
+    "hit_top20": 0.3745
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.6367,
+    "hit_top10": 0.191,
+    "hit_top20": 0.3483
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6872,
+    "hit_top10": 0.2509,
+    "hit_top20": 0.4307
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.6734,
+    "hit_top10": 0.2472,
+    "hit_top20": 0.4195
+   }
+  },
+  "free_windows_in_sample": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.7314,
+    "hit_top10": 0.3596,
+    "hit_top20": 0.5281
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.7124,
+    "hit_top10": 0.3258,
+    "hit_top20": 0.4757
+   },
+   "trig_tol": {
+    "n": 267,
+    "auc": 0.6672,
+    "hit_top10": 0.2509,
+    "hit_top20": 0.4045
+   },
+   "trig_exact": {
+    "n": 267,
+    "auc": 0.6574,
+    "hit_top10": 0.2622,
+    "hit_top20": 0.397
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.7335,
+    "hit_top10": 0.3521,
+    "hit_top20": 0.5206
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.7149,
+    "hit_top10": 0.3296,
+    "hit_top20": 0.4794
+   }
+  },
+  "lgbm_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.708,
+    "hit_top10": 0.2734,
+    "hit_top20": 0.4644
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.7059,
+    "hit_top10": 0.2509,
+    "hit_top20": 0.4719
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.7092,
+    "hit_top10": 0.2659,
+    "hit_top20": 0.4644
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.708,
+    "hit_top10": 0.2659,
+    "hit_top20": 0.4757
+   }
+  },
+  "logit_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6829,
+    "hit_top10": 0.2697,
+    "hit_top20": 0.4157
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6792,
+    "hit_top10": 0.2509,
+    "hit_top20": 0.397
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6834,
+    "hit_top10": 0.2772,
+    "hit_top20": 0.4307
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.6803,
+    "hit_top10": 0.2622,
+    "hit_top20": 0.4157
+   }
+  },
+  "lgbm_calendar_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6503,
+    "hit_top10": 0.2434,
+    "hit_top20": 0.3408
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6435,
+    "hit_top10": 0.2097,
+    "hit_top20": 0.3371
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6526,
+    "hit_top10": 0.2434,
+    "hit_top20": 0.3596
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.647,
+    "hit_top10": 0.2172,
+    "hit_top20": 0.3483
+   }
+  },
+  "lgbm_weather_loyo": {
+   "comb_tol": {
+    "n": 267,
+    "auc": 0.6719,
+    "hit_top10": 0.2097,
+    "hit_top20": 0.4007
+   },
+   "comb_exact": {
+    "n": 267,
+    "auc": 0.6657,
+    "hit_top10": 0.2022,
+    "hit_top20": 0.397
+   },
+   "comb_tol_wk": {
+    "n": 267,
+    "auc": 0.6729,
+    "hit_top10": 0.206,
+    "hit_top20": 0.3895
+   },
+   "comb_exact_wk": {
+    "n": 267,
+    "auc": 0.6688,
+    "hit_top10": 0.2135,
+    "hit_top20": 0.4082
+   }
+  }
+ },
+ "free_windows_best": {
+  "t_opt": 17.60905177456778,
+  "t_sd": 6.835016095027713,
+  "t_window": 10,
+  "p_window": 14,
+  "p_half": 81.1179405514749,
+  "pulse_min": 10.46386759496425,
+  "pulse_lag": [
+   14,
+   19
+  ],
+  "heat_tmax": 28.80297555484644,
+  "heat_window": 14,
+  "frost_tmin": -0.6870252764655467,
+  "frost_window": 14
+ },
+ "n_finds": 267,
+ "years": [
+  2010,
+  2011,
+  2012,
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021,
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "n_candidates": 1000,
+ "seed": 0,
+ "tuned_gain_loyo": 0.0379,
+ "ml_wins": false
+}

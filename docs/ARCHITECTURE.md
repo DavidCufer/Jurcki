@@ -45,7 +45,7 @@ backend/jurcki/
   grid.py          model grid helpers, Slovenia mask
   sources/         one module per data source (dem, landcover, weather, gbif, forums…)
   features.py      stack static + dynamic features
-  model/           prior.py (rules), train.py, backtest.py
+  model/           prior.py (rules), evaluate.py (metrics), habitat.py (where), trigger.py (when)
   export.py        outputs for the app
 android/           Kotlin + Compose + MapLibre viewer
 data/processed/    small derived files (committed)
