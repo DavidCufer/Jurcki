@@ -311,3 +311,14 @@ def test_cli_openmeteo_days_window():
     # today - 2 .. today + 6 with the first forecast day = today + 1
     assert (P.OUT_PAST, P.OUT_AHEAD, P.OM_FORECAST_DAYS) == (2, 6, 7)
     assert P.OM_PAST_DAYS >= P.LOOKBACK + P.OUT_PAST
+
+
+def test_runtime_pack_is_sane():
+    """The committed runtime pack must decode to the real layers (it is all CI has)."""
+    P._static.cache_clear()
+    mask = P.load_mask(runtime=True)
+    elev = P.load_elev(runtime=True)
+    assert 320_000 < mask.sum() < 330_000          # Slovenia ~ 20 273 km2 of 250 m cells
+    assert not mask[0].any() and not mask[-1].any()
+    assert 50 < np.median(elev[mask]) < 1000 and elev[mask].max() < 2900
+    P._static.cache_clear()
