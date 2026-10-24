@@ -1,0 +1,1515 @@
+{
+ "schema_version": 1,
+ "created": "2026-10-24T17:52:42+00:00",
+ "spec_doc": "docs/APP_ENGINE.md",
+ "summary": "score(pixel, day) = clip(habitat(pixel) * season_factor(month(day)) * trigger(pixel, day) / reference, 0, 1)",
+ "raster": {
+  "crs": "EPSG:3857-aligned",
+  "nx": 1009,
+  "ny": 661,
+  "px": 360.0,
+  "x0": 1487228.3969981347,
+  "y_top": 5924260.199618344,
+  "r_earth": 6378137.0,
+  "bounds": [
+   13.36,
+   45.41,
+   16.6230404,
+   46.8907519
+  ],
+  "ground_px_m_at_46N": 249.6,
+  "description": "North-up, row 0 = maxLat, column 0 = minLon. Columns are even in longitude, rows even in Web-Mercator y with the same pixel size, so lon/lat <-> row/col is analytic (see formulas) and one image quad covers the map.",
+  "pixel_centre": "lon = deg(x0 + (col + 0.5) * px / r_earth);  lat = deg(2*atan(exp((y_top - (row + 0.5) * px) / r_earth)) - pi/2)",
+  "lonlat_to_rowcol": "col = (r_earth * rad(lon) - x0) / px;  row = (y_top - r_earth * ln(tan(pi/4 + rad(lat)/2))) / px;  pixel = (floor(row), floor(col)); centres are at +0.5",
+  "files": {
+   "habitat": {
+    "file": "habitat.u8.gz",
+    "dtype": "uint8",
+    "value": "habitat = byte / 250 (0..1)",
+    "nodata": 255,
+    "scale": 250.0
+   },
+   "elev": {
+    "file": "elev.i16.gz",
+    "dtype": "int16 little endian",
+    "value": "metres above sea level",
+    "nodata": -32768
+   },
+   "mask": {
+    "file": "mask.u8.gz",
+    "dtype": "uint8",
+    "value": "1 = Slovenia land, 0 = outside"
+   }
+  },
+  "encoding": "raw row-major array (nx * ny values, row 0 first), gzip-compressed; no header",
+  "nodata_rule": "habitat and elev are nodata exactly where mask == 0; the score is undefined (transparent) there"
+ },
+ "trigger": {
+  "params": {
+   "t_opt": 17.60905177456778,
+   "t_sd": 6.835016095027713,
+   "t_window": 20,
+   "p_window": 26,
+   "p_half": 81.1179405514749,
+   "pulse_min": 10.46386759496425,
+   "pulse_lag": [
+    14,
+    19
+   ],
+   "heat_tmax": 28.80297555484644,
+   "heat_window": 10,
+   "frost_tmin": -0.6870252764655467,
+   "frost_window": 7
+  },
+  "params_literature": {
+   "t_opt": 13.0,
+   "t_sd": 4.0,
+   "t_window": 20,
+   "p_window": 26,
+   "p_half": 60.0,
+   "pulse_min": 20.0,
+   "pulse_lag": [
+    7,
+    16
+   ],
+   "heat_tmax": 30.0,
+   "heat_window": 10,
+   "frost_tmin": -1.0,
+   "frost_window": 7
+  },
+  "units": {
+   "t_opt": "degC",
+   "t_sd": "degC",
+   "t_window": "days",
+   "p_window": "days",
+   "p_half": "mm",
+   "pulse_min": "mm per 3 days",
+   "pulse_lag": "days [lo, hi]",
+   "heat_tmax": "degC",
+   "heat_window": "days",
+   "frost_tmin": "degC",
+   "frost_window": "days"
+  },
+  "source": "data/processed/trigger_params.json (recommended = tuned)",
+  "note": "Only the trigger fields of PriorParams are used on the phone; the habitat fields of PriorParams are not (habitat comes from the raster).",
+  "formula": {
+   "temp": "exp(-0.5 * ((t20 - t_opt) / t_sd)^2)",
+   "rain": "0.6 * (p26 / (p26 + p_half)) + 0.4 * pulse",
+   "heat": "clamp(1 - (tmax10 - heat_tmax) / 5, 0.2, 1.0)",
+   "frost": "clamp((tmin7 - frost_tmin) / 3 + 1, 0.0, 1.0)",
+   "trigger": "clamp(temp * rain * heat * frost, 0, 1)"
+  }
+ },
+ "score": {
+  "reference": 0.75773,
+  "reference_note": "fixed constant (99.9th percentile of habitat*season*trigger over forest cells, Aug-Oct 2010-2025); NOT a per-day normalisation",
+  "season_factor": {
+   "1": 0.0,
+   "2": 0.0,
+   "3": 0.0,
+   "4": 0.05,
+   "5": 0.25,
+   "6": 0.55,
+   "7": 0.6,
+   "8": 0.85,
+   "9": 1.0,
+   "10": 0.9,
+   "11": 0.35,
+   "12": 0.0
+  },
+  "season_factor_note": "key = month of the LOCAL calendar day (1..12) of the day being scored",
+  "formula": "raw = habitat * season_factor * trigger;  score = clamp(raw / reference, 0, 1)",
+  "habitat_nodata_in_mask": "treat as 0"
+ },
+ "lapse_rate_k_per_m": -0.0065,
+ "weather": {
+  "provider": "Open-Meteo (https://open-meteo.com), no API key for non-commercial use",
+  "timezone": "Europe/Ljubljana",
+  "lattice": {
+   "lat0": 45.25,
+   "lon0": 13.25,
+   "step": 0.25,
+   "n_lat": 8,
+   "n_lon": 15,
+   "points": [
+    [
+     45.25,
+     13.25,
+     0
+    ],
+    [
+     45.25,
+     13.5,
+     17
+    ],
+    [
+     45.25,
+     13.75,
+     131
+    ],
+    [
+     45.25,
+     14.0,
+     280
+    ],
+    [
+     45.25,
+     14.25,
+     687
+    ],
+    [
+     45.25,
+     14.5,
+     462
+    ],
+    [
+     45.25,
+     14.75,
+     850
+    ],
+    [
+     45.25,
+     15.0,
+     750
+    ],
+    [
+     45.25,
+     15.25,
+     355
+    ],
+    [
+     45.25,
+     15.5,
+     176
+    ],
+    [
+     45.25,
+     15.75,
+     189
+    ],
+    [
+     45.25,
+     16.0,
+     160
+    ],
+    [
+     45.25,
+     16.25,
+     192
+    ],
+    [
+     45.25,
+     16.5,
+     130
+    ],
+    [
+     45.25,
+     16.75,
+     98
+    ],
+    [
+     45.5,
+     13.25,
+     0
+    ],
+    [
+     45.5,
+     13.5,
+     11
+    ],
+    [
+     45.5,
+     13.75,
+     172
+    ],
+    [
+     45.5,
+     14.0,
+     525
+    ],
+    [
+     45.5,
+     14.25,
+     639
+    ],
+    [
+     45.5,
+     14.5,
+     991
+    ],
+    [
+     45.5,
+     14.75,
+     720
+    ],
+    [
+     45.5,
+     15.0,
+     591
+    ],
+    [
+     45.5,
+     15.25,
+     257
+    ],
+    [
+     45.5,
+     15.5,
+     175
+    ],
+    [
+     45.5,
+     15.75,
+     153
+    ],
+    [
+     45.5,
+     16.0,
+     159
+    ],
+    [
+     45.5,
+     16.25,
+     127
+    ],
+    [
+     45.5,
+     16.5,
+     105
+    ],
+    [
+     45.5,
+     16.75,
+     117
+    ],
+    [
+     45.75,
+     13.25,
+     3
+    ],
+    [
+     45.75,
+     13.5,
+     22
+    ],
+    [
+     45.75,
+     13.75,
+     209
+    ],
+    [
+     45.75,
+     14.0,
+     544
+    ],
+    [
+     45.75,
+     14.25,
+     679
+    ],
+    [
+     45.75,
+     14.5,
+     779
+    ],
+    [
+     45.75,
+     14.75,
+     626
+    ],
+    [
+     45.75,
+     15.0,
+     483
+    ],
+    [
+     45.75,
+     15.25,
+     375
+    ],
+    [
+     45.75,
+     15.5,
+     397
+    ],
+    [
+     45.75,
+     15.75,
+     199
+    ],
+    [
+     45.75,
+     16.0,
+     148
+    ],
+    [
+     45.75,
+     16.25,
+     108
+    ],
+    [
+     45.75,
+     16.5,
+     117
+    ],
+    [
+     45.75,
+     16.75,
+     152
+    ],
+    [
+     46.0,
+     13.25,
+     72
+    ],
+    [
+     46.0,
+     13.5,
+     159
+    ],
+    [
+     46.0,
+     13.75,
+     554
+    ],
+    [
+     46.0,
+     14.0,
+     716
+    ],
+    [
+     46.0,
+     14.25,
+     566
+    ],
+    [
+     46.0,
+     14.5,
+     414
+    ],
+    [
+     46.0,
+     14.75,
+     435
+    ],
+    [
+     46.0,
+     15.0,
+     476
+    ],
+    [
+     46.0,
+     15.25,
+     378
+    ],
+    [
+     46.0,
+     15.5,
+     327
+    ],
+    [
+     46.0,
+     15.75,
+     201
+    ],
+    [
+     46.0,
+     16.0,
+     285
+    ],
+    [
+     46.0,
+     16.25,
+     199
+    ],
+    [
+     46.0,
+     16.5,
+     159
+    ],
+    [
+     46.0,
+     16.75,
+     161
+    ],
+    [
+     46.25,
+     13.25,
+     722
+    ],
+    [
+     46.25,
+     13.5,
+     806
+    ],
+    [
+     46.25,
+     13.75,
+     1081
+    ],
+    [
+     46.25,
+     14.0,
+     967
+    ],
+    [
+     46.25,
+     14.25,
+     618
+    ],
+    [
+     46.25,
+     14.5,
+     680
+    ],
+    [
+     46.25,
+     14.75,
+     764
+    ],
+    [
+     46.25,
+     15.0,
+     510
+    ],
+    [
+     46.25,
+     15.25,
+     422
+    ],
+    [
+     46.25,
+     15.5,
+     354
+    ],
+    [
+     46.25,
+     15.75,
+     318
+    ],
+    [
+     46.25,
+     16.0,
+     316
+    ],
+    [
+     46.25,
+     16.25,
+     239
+    ],
+    [
+     46.25,
+     16.5,
+     216
+    ],
+    [
+     46.25,
+     16.75,
+     179
+    ],
+    [
+     46.5,
+     13.25,
+     1115
+    ],
+    [
+     46.5,
+     13.5,
+     1202
+    ],
+    [
+     46.5,
+     13.75,
+     1174
+    ],
+    [
+     46.5,
+     14.0,
+     906
+    ],
+    [
+     46.5,
+     14.25,
+     891
+    ],
+    [
+     46.5,
+     14.5,
+     922
+    ],
+    [
+     46.5,
+     14.75,
+     931
+    ],
+    [
+     46.5,
+     15.0,
+     692
+    ],
+    [
+     46.5,
+     15.25,
+     805
+    ],
+    [
+     46.5,
+     15.5,
+     664
+    ],
+    [
+     46.5,
+     15.75,
+     273
+    ],
+    [
+     46.5,
+     16.0,
+     239
+    ],
+    [
+     46.5,
+     16.25,
+     207
+    ],
+    [
+     46.5,
+     16.5,
+     179
+    ],
+    [
+     46.5,
+     16.75,
+     190
+    ],
+    [
+     46.75,
+     13.25,
+     1055
+    ],
+    [
+     46.75,
+     13.5,
+     1121
+    ],
+    [
+     46.75,
+     13.75,
+     1200
+    ],
+    [
+     46.75,
+     14.0,
+     1030
+    ],
+    [
+     46.75,
+     14.25,
+     724
+    ],
+    [
+     46.75,
+     14.5,
+     688
+    ],
+    [
+     46.75,
+     14.75,
+     762
+    ],
+    [
+     46.75,
+     15.0,
+     1091
+    ],
+    [
+     46.75,
+     15.25,
+     518
+    ],
+    [
+     46.75,
+     15.5,
+     364
+    ],
+    [
+     46.75,
+     15.75,
+     298
+    ],
+    [
+     46.75,
+     16.0,
+     266
+    ],
+    [
+     46.75,
+     16.25,
+     260
+    ],
+    [
+     46.75,
+     16.5,
+     212
+    ],
+    [
+     46.75,
+     16.75,
+     221
+    ],
+    [
+     47.0,
+     13.25,
+     1715
+    ],
+    [
+     47.0,
+     13.5,
+     1474
+    ],
+    [
+     47.0,
+     13.75,
+     1796
+    ],
+    [
+     47.0,
+     14.0,
+     1535
+    ],
+    [
+     47.0,
+     14.25,
+     998
+    ],
+    [
+     47.0,
+     14.5,
+     951
+    ],
+    [
+     47.0,
+     14.75,
+     1157
+    ],
+    [
+     47.0,
+     15.0,
+     1198
+    ],
+    [
+     47.0,
+     15.25,
+     570
+    ],
+    [
+     47.0,
+     15.5,
+     342
+    ],
+    [
+     47.0,
+     15.75,
+     357
+    ],
+    [
+     47.0,
+     16.0,
+     333
+    ],
+    [
+     47.0,
+     16.25,
+     299
+    ],
+    [
+     47.0,
+     16.5,
+     258
+    ],
+    [
+     47.0,
+     16.75,
+     232
+    ]
+   ]
+  },
+  "lattice_note": "points = [lat, lon, elevation_m]; order is latitude ascending (outer) then longitude ascending (inner), index k = i_lat * n_lon + i_lon. elevation_m is the mean DEM height (whole metres) of the 0.25 deg box around the point: pass it as `elevation` and use the `elevation` echoed in the response as the point's orography.",
+  "batch_size": 50,
+  "daily_variables": [
+   "temperature_2m_mean",
+   "temperature_2m_max",
+   "temperature_2m_min",
+   "precipitation_sum"
+  ],
+  "variable_map": {
+   "tmean": "temperature_2m_mean",
+   "tmax": "temperature_2m_max",
+   "tmin": "temperature_2m_min",
+   "precip": "precipitation_sum"
+  },
+  "units": {
+   "temperature": "degC",
+   "precipitation": "mm per local day"
+  },
+  "daily_aggregation": "Do NOT request hourly data. Open-Meteo aggregates to local calendar days (00:00-24:00 Europe/Ljubljana, timezone=Europe/Ljubljana): mean / max / min of hourly 2 m temperature and the sum of hourly precipitation. The phone uses these four daily series as is.",
+  "forecast_recent": {
+   "use": "today and the following days (default), and any date within the last ~60 days",
+   "url": "https://api.open-meteo.com/v1/forecast",
+   "past_days": 62,
+   "forecast_days": 7,
+   "models": "default (best_match) - do not pass `models`",
+   "requests": [
+    {
+     "url": "https://api.open-meteo.com/v1/forecast",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "past_days": 62,
+      "forecast_days": 7,
+      "latitude": "45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,46.0,46.0,46.0,46.0,46.0",
+      "longitude": "13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25",
+      "elevation": "0,17,131,280,687,462,850,750,355,176,189,160,192,130,98,0,11,172,525,639,991,720,591,257,175,153,159,127,105,117,3,22,209,544,679,779,626,483,375,397,199,148,108,117,152,72,159,554,716,566"
+     }
+    },
+    {
+     "url": "https://api.open-meteo.com/v1/forecast",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "past_days": 62,
+      "forecast_days": 7,
+      "latitude": "46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75",
+      "longitude": "14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5",
+      "elevation": "414,435,476,378,327,201,285,199,159,161,722,806,1081,967,618,680,764,510,422,354,318,316,239,216,179,1115,1202,1174,906,891,922,931,692,805,664,273,239,207,179,190,1055,1121,1200,1030,724,688,762,1091,518,364"
+     }
+    },
+    {
+     "url": "https://api.open-meteo.com/v1/forecast",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "past_days": 62,
+      "forecast_days": 7,
+      "latitude": "46.75,46.75,46.75,46.75,46.75,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0",
+      "longitude": "15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75",
+      "elevation": "298,266,260,212,221,1715,1474,1796,1535,998,951,1157,1198,570,342,357,333,299,258,232"
+     }
+    }
+   ],
+   "requests_note": "one GET per batch of 50 points (3 requests: 50, 50, 20); `latitude`, `longitude`, `elevation` are comma-separated lists of equal length in lattice order. These are the queries the production client builds, minus the `hourly` block the phone omits.",
+   "window": "past_days + forecast_days = 69 daily values: today-62 .. today+6 (today = Europe/Ljubljana date)",
+   "output_days": {
+    "past": 2,
+    "ahead": 6,
+    "meaning": "the app shows today-2 .. today+6 (9 days)"
+   }
+  },
+  "history": {
+   "use": "a past day older than the forecast window (backtest / browsing the past); needs 60 days before it",
+   "url": "https://archive-api.open-meteo.com/v1/archive",
+   "models": "era5",
+   "requests_example": [
+    {
+     "url": "https://archive-api.open-meteo.com/v1/archive",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "start_date": "2025-07-31",
+      "end_date": "2025-09-29",
+      "models": "era5",
+      "latitude": "45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.25,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.5,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,45.75,46.0,46.0,46.0,46.0,46.0",
+      "longitude": "13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25",
+      "elevation": "0,17,131,280,687,462,850,750,355,176,189,160,192,130,98,0,11,172,525,639,991,720,591,257,175,153,159,127,105,117,3,22,209,544,679,779,626,483,375,397,199,148,108,117,152,72,159,554,716,566"
+     }
+    },
+    {
+     "url": "https://archive-api.open-meteo.com/v1/archive",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "start_date": "2025-07-31",
+      "end_date": "2025-09-29",
+      "models": "era5",
+      "latitude": "46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.0,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.25,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.5,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75,46.75",
+      "longitude": "14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5",
+      "elevation": "414,435,476,378,327,201,285,199,159,161,722,806,1081,967,618,680,764,510,422,354,318,316,239,216,179,1115,1202,1174,906,891,922,931,692,805,664,273,239,207,179,190,1055,1121,1200,1030,724,688,762,1091,518,364"
+     }
+    },
+    {
+     "url": "https://archive-api.open-meteo.com/v1/archive",
+     "params": {
+      "timezone": "Europe/Ljubljana",
+      "daily": "temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum",
+      "start_date": "2025-07-31",
+      "end_date": "2025-09-29",
+      "models": "era5",
+      "latitude": "46.75,46.75,46.75,46.75,46.75,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0,47.0",
+      "longitude": "15.75,16.0,16.25,16.5,16.75,13.25,13.5,13.75,14.0,14.25,14.5,14.75,15.0,15.25,15.5,15.75,16.0,16.25,16.5,16.75",
+      "elevation": "298,266,260,212,221,1715,1474,1796,1535,998,951,1157,1198,570,342,357,333,299,258,232"
+     }
+    }
+   ],
+   "window": "start_date = D_first - 60 days, end_date = D_last (inclusive, local dates)",
+   "note": "models=era5 is the 0.25 deg ERA5 reanalysis the model was trained on. The archive lags real time by a few days, so use `forecast_recent` for the last ~week. NOT verified from this build environment (api hosts are blocked): check the first live response against the vectors' schema."
+  },
+  "response_format": {
+   "multiple_locations": "JSON array, one object per requested point, same order as the request",
+   "single_location": "a single JSON object (the last batch can have 1 point if the lattice size changes)",
+   "location_object": {
+    "latitude": "echoed (nearest grid), ignore",
+    "longitude": "echoed, ignore",
+    "elevation": "metres used for the downscaling (= passed value) -> orography",
+    "daily": {
+     "time": [
+      "YYYY-MM-DD",
+      "..."
+     ],
+     "temperature_2m_mean": [
+      "number|null"
+     ],
+     "temperature_2m_max": [
+      "number|null"
+     ],
+     "temperature_2m_min": [
+      "number|null"
+     ],
+     "precipitation_sum": [
+      "number|null"
+     ]
+    }
+   },
+   "errors": "HTTP 200 with {\"error\": true, \"reason\": \"...\"} is an error; HTTP 429 = rate limited (wait ~60 s); retry 5xx with back-off",
+   "match": "locations are matched to lattice points by POSITION in the array, not by the echoed coordinates"
+  },
+  "orography": "orography[i][j] = response.elevation of point (i, j) (falls back to the passed elevation_m). It is the height at which the point's temperatures are valid.",
+  "gap_filling": [
+   "1. Days = contiguous calendar days from the earliest to the latest `time` returned by any point.",
+   "2. null / missing value -> NaN, per point and per variable.",
+   "3. Per point and variable: NaN inside the series -> linear interpolation in the day index; NaN after the last valid value -> that last value (carry forward); NaN before the first valid value -> the first valid value (carry backward). This applies to precipitation as well.",
+   "4. A point/variable with no valid value at all -> copy the whole series of the nearest point that has data (Euclidean distance in lattice index space (i_lat, i_lon); ties: first in lattice order)."
+  ]
+ },
+ "features": {
+  "note": "All windows are TRAILING and INCLUDE the current day: window(t, w) = days t-w+1 .. t. At the start of the series the window is truncated to the days that exist (means divide by the number of days present, max / min / sum over the days present) - there is no NaN. They are computed per coarse point on the unshifted Open-Meteo series (the lapse shift is applied later, per pixel).",
+  "history_days_needed": 60,
+  "defs": [
+   {
+    "name": "t20",
+    "definition": "mean(tmean over window t_window)",
+    "window_param": "t_window"
+   },
+   {
+    "name": "p26",
+    "definition": "sum(precip over window p_window)",
+    "window_param": "p_window"
+   },
+   {
+    "name": "tmax10",
+    "definition": "max(tmax over window heat_window)",
+    "window_param": "heat_window"
+   },
+   {
+    "name": "tmin7",
+    "definition": "min(tmin over window frost_window)",
+    "window_param": "frost_window"
+   },
+   {
+    "name": "pulse",
+    "definition": "see pulse_steps"
+   }
+  ],
+  "pulse_steps": [
+   "rain3[t] = sum(precip over window 3 ending at t)  (truncated at the start)",
+   "soak[t] = 1 if rain3[t] >= pulse_min else 0",
+   "lo, hi = pulse_lag;  recent[t] = max(soak over window (hi - lo + 1) ending at t)  (truncated at the start)",
+   "pulse[t] = recent[t - lo] if t >= lo else 0     (i.e. 1 if a soaking rain ended between lo and hi days ago)"
+  ],
+  "pulse_note": "pulse is a 0/1 flag at the coarse points; it becomes a smooth fraction 0..1 after bilinear interpolation to the pixels (that is what production does).",
+  "lapse_corrected": [
+   "t20",
+   "tmax10",
+   "tmin7"
+  ],
+  "not_lapse_corrected": [
+   "p26",
+   "pulse"
+  ]
+ },
+ "downscaling": {
+  "method": "bilinear interpolation in lon/lat on the coarse lattice, of the FEATURES (not of the daily series)",
+  "formulas": [
+   "fi = clamp((lat - lat0) / step, 0, n_lat - 1);  fj = clamp((lon - lon0) / step, 0, n_lon - 1)",
+   "i0 = min(floor(fi), n_lat - 2);  j0 = min(floor(fj), n_lon - 2);  di = fi - i0;  dj = fj - j0",
+   "bil(F) = F[i0][j0]*(1-di)*(1-dj) + F[i0][j0+1]*(1-di)*dj + F[i0+1][j0]*di*(1-dj) + F[i0+1][j0+1]*di*dj",
+   "orog_px = bil(orography);  dz = lapse_rate_k_per_m * (elev_px - orog_px)      (elev_px from the elev raster)",
+   "t20_px = bil(t20) + dz;  tmax10_px = bil(tmax10) + dz;  tmin7_px = bil(tmin7) + dz;  p26_px = bil(p26);  pulse_px = bil(pulse)"
+  ],
+  "edges": "outside the lattice the nearest edge value is used (clamping, no extrapolation)",
+  "pixel_lonlat": "pixel centre (see raster.pixel_centre)",
+  "equivalence": "The lapse shift is constant over a window so it commutes with mean / max / min: shifting the features equals shifting the daily series. The trigger is evaluated per pixel AFTER the interpolation (it is not interpolated)."
+ },
+ "hotspots": {
+  "source": "export.pick_hotspots / export.hotspots_geojson",
+  "inputs": "score, habitat, trigger (and elev) of the pixels of one day",
+  "rank": "rank = score + 0.001 * habitat * trigger   (Float32 arithmetic in production; the 0.001 term breaks ties among clipped scores)",
+  "candidates": "mask == 1 and rank >= min_score",
+  "min_score": 0.15,
+  "min_sep_px": 6.0,
+  "max_n": 300,
+  "algorithm": [
+   "sort candidates by descending rank; ties by ascending row, then ascending column (stable sort of the row-major scan)",
+   "walk the list; skip candidates already suppressed; otherwise pick it and suppress every candidate (including itself) whose pixel distance sqrt(drow^2 + dcol^2) < min_sep_px  (strictly less)",
+   "stop when max_n picks have been made"
+  ],
+  "min_sep_note": "production uses 1500 m on the 250 m grid (< 6 cells); the phone grid has ~250 m pixels, so 6 px.",
+  "output": "picks sorted by descending rank: lon/lat of the pixel centre, score, habitat, trigger (0..1, 3 decimals), elev (m)"
+ },
+ "colormap": {
+  "legend": [
+   [
+    0.0,
+    "#FFFFB2"
+   ],
+   [
+    0.2,
+    "#FED976"
+   ],
+   [
+    0.4,
+    "#FEB24C"
+   ],
+   [
+    0.6,
+    "#FD8D3C"
+   ],
+   [
+    0.8,
+    "#E31A1C"
+   ],
+   [
+    1.0,
+    "#800026"
+   ]
+  ],
+  "min_score": 0.04,
+  "alpha_full_at": 0.4,
+  "alpha_max": 0.92,
+  "levels": 64,
+  "rule": [
+   "level = clamp(rint(score * (levels - 1)), 0, levels - 1)   (rint = round half to even; NaN score -> transparent)",
+   "s = level / (levels - 1)",
+   "rgb: per channel linear interpolation between the legend stops at s, rounded half to even to 0..255",
+   "alpha = 0 if s < min_score else clamp((s - min_score) / (alpha_full_at - min_score), 0, 1) * alpha_max; alpha255 = rint(alpha * 255)",
+   "pixels outside the mask are fully transparent"
+  ],
+  "lut": [
+   [
+    255,
+    255,
+    178,
+    0
+   ],
+   [
+    255,
+    252,
+    173,
+    0
+   ],
+   [
+    255,
+    249,
+    168,
+    0
+   ],
+   [
+    255,
+    246,
+    164,
+    5
+   ],
+   [
+    255,
+    243,
+    159,
+    15
+   ],
+   [
+    255,
+    240,
+    154,
+    26
+   ],
+   [
+    255,
+    237,
+    149,
+    36
+   ],
+   [
+    254,
+    234,
+    145,
+    46
+   ],
+   [
+    254,
+    231,
+    140,
+    57
+   ],
+   [
+    254,
+    228,
+    135,
+    67
+   ],
+   [
+    254,
+    225,
+    130,
+    77
+   ],
+   [
+    254,
+    222,
+    126,
+    88
+   ],
+   [
+    254,
+    219,
+    121,
+    98
+   ],
+   [
+    254,
+    216,
+    117,
+    108
+   ],
+   [
+    254,
+    213,
+    113,
+    119
+   ],
+   [
+    254,
+    210,
+    110,
+    129
+   ],
+   [
+    254,
+    206,
+    107,
+    139
+   ],
+   [
+    254,
+    203,
+    103,
+    150
+   ],
+   [
+    254,
+    200,
+    100,
+    160
+   ],
+   [
+    254,
+    197,
+    97,
+    170
+   ],
+   [
+    254,
+    194,
+    93,
+    181
+   ],
+   [
+    254,
+    191,
+    90,
+    191
+   ],
+   [
+    254,
+    188,
+    87,
+    201
+   ],
+   [
+    254,
+    185,
+    83,
+    212
+   ],
+   [
+    254,
+    182,
+    80,
+    222
+   ],
+   [
+    254,
+    179,
+    77,
+    233
+   ],
+   [
+    254,
+    176,
+    75,
+    235
+   ],
+   [
+    254,
+    173,
+    74,
+    235
+   ],
+   [
+    254,
+    170,
+    72,
+    235
+   ],
+   [
+    254,
+    167,
+    71,
+    235
+   ],
+   [
+    254,
+    164,
+    70,
+    235
+   ],
+   [
+    254,
+    161,
+    69,
+    235
+   ],
+   [
+    253,
+    158,
+    67,
+    235
+   ],
+   [
+    253,
+    155,
+    66,
+    235
+   ],
+   [
+    253,
+    152,
+    65,
+    235
+   ],
+   [
+    253,
+    149,
+    64,
+    235
+   ],
+   [
+    253,
+    146,
+    62,
+    235
+   ],
+   [
+    253,
+    143,
+    61,
+    235
+   ],
+   [
+    253,
+    139,
+    59,
+    235
+   ],
+   [
+    251,
+    130,
+    57,
+    235
+   ],
+   [
+    248,
+    121,
+    54,
+    235
+   ],
+   [
+    246,
+    112,
+    52,
+    235
+   ],
+   [
+    244,
+    103,
+    49,
+    235
+   ],
+   [
+    242,
+    94,
+    47,
+    235
+   ],
+   [
+    240,
+    84,
+    44,
+    235
+   ],
+   [
+    238,
+    75,
+    42,
+    235
+   ],
+   [
+    236,
+    66,
+    39,
+    235
+   ],
+   [
+    234,
+    57,
+    37,
+    235
+   ],
+   [
+    232,
+    48,
+    34,
+    235
+   ],
+   [
+    230,
+    39,
+    32,
+    235
+   ],
+   [
+    228,
+    30,
+    29,
+    235
+   ],
+   [
+    222,
+    25,
+    28,
+    235
+   ],
+   [
+    214,
+    23,
+    29,
+    235
+   ],
+   [
+    207,
+    21,
+    30,
+    235
+   ],
+   [
+    199,
+    19,
+    31,
+    235
+   ],
+   [
+    191,
+    17,
+    32,
+    235
+   ],
+   [
+    183,
+    14,
+    32,
+    235
+   ],
+   [
+    175,
+    12,
+    33,
+    235
+   ],
+   [
+    167,
+    10,
+    34,
+    235
+   ],
+   [
+    159,
+    8,
+    35,
+    235
+   ],
+   [
+    152,
+    6,
+    36,
+    235
+   ],
+   [
+    144,
+    4,
+    36,
+    235
+   ],
+   [
+    136,
+    2,
+    37,
+    235
+   ],
+   [
+    128,
+    0,
+    38,
+    235
+   ]
+  ],
+  "lut_note": "RGBA for level 0..63; use this table directly - it is the exact output of the rule above"
+ },
+ "validation": {
+  "days": {
+   "2025-09-20": {
+    "score": {
+     "mean_abs": 0.00112,
+     "rms": 0.00174,
+     "p99_abs": 0.006,
+     "max_abs": 0.0494,
+     "bias": 0.00013,
+     "corr": 0.99997
+    },
+    "trigger": {
+     "mean_abs": 0.00031,
+     "rms": 0.00092,
+     "p99_abs": 0.0036,
+     "max_abs": 0.0395,
+     "bias": 0.00025,
+     "corr": 0.99996
+    },
+    "mean_score_phone": 0.479,
+    "mean_score_production": 0.4789,
+    "top5pct_overlap_jaccard": 0.984,
+    "season_factor": 1.0,
+    "n_pixels": 326241,
+    "hotspots": {
+     "production": 300,
+     "phone": 300,
+     "share_of_production_top20_with_phone_hotspot_within_3km": 1.0,
+     "share_of_production_all_with_phone_hotspot_within_3km": 0.927,
+     "share_of_phone_all_with_production_hotspot_within_3km": 0.843
+    }
+   },
+   "2024-07-25": {
+    "score": {
+     "mean_abs": 0.00028,
+     "rms": 0.00062,
+     "p99_abs": 0.0026,
+     "max_abs": 0.0196,
+     "bias": 3e-05,
+     "corr": 0.99995
+    },
+    "trigger": {
+     "mean_abs": 0.00026,
+     "rms": 0.00103,
+     "p99_abs": 0.0042,
+     "max_abs": 0.0452,
+     "bias": 7e-05,
+     "corr": 0.99998
+    },
+    "mean_score_phone": 0.0485,
+    "mean_score_production": 0.0485,
+    "top5pct_overlap_jaccard": 0.991,
+    "season_factor": 0.6,
+    "n_pixels": 326241,
+    "hotspots": {
+     "production": 300,
+     "phone": 300,
+     "share_of_production_top20_with_phone_hotspot_within_3km": 1.0,
+     "share_of_production_all_with_phone_hotspot_within_3km": 0.987,
+     "share_of_phone_all_with_production_hotspot_within_3km": 0.947
+    }
+   },
+   "2023-10-10": {
+    "score": {
+     "mean_abs": 0.00081,
+     "rms": 0.00105,
+     "p99_abs": 0.0031,
+     "max_abs": 0.0147,
+     "bias": 2e-05,
+     "corr": 0.99998
+    },
+    "trigger": {
+     "mean_abs": 0.00015,
+     "rms": 0.00036,
+     "p99_abs": 0.0014,
+     "max_abs": 0.0139,
+     "bias": 0.00012,
+     "corr": 0.99999
+    },
+    "mean_score_phone": 0.3836,
+    "mean_score_production": 0.3836,
+    "top5pct_overlap_jaccard": 0.988,
+    "season_factor": 0.9,
+    "n_pixels": 326241,
+    "hotspots": {
+     "production": 300,
+     "phone": 300,
+     "share_of_production_top20_with_phone_hotspot_within_3km": 1.0,
+     "share_of_production_all_with_phone_hotspot_within_3km": 0.937,
+     "share_of_phone_all_with_production_hotspot_within_3km": 0.847
+    }
+   }
+  },
+  "weather": "local ERA5 0.25 deg history (data/interim/weather), no network",
+  "note": "production maps are bilinearly resampled to the phone pixels before comparing",
+  "habitat_raster_vs_resampled_source": {
+   "mean_abs": 0.00096,
+   "rms": 0.00113,
+   "p99_abs": 0.002,
+   "max_abs": 0.002,
+   "bias": -0.0,
+   "corr": 0.99999
+  },
+  "elev_raster_vs_resampled_source_m": {
+   "mean_abs": 0.24985,
+   "rms": 0.28853,
+   "p99_abs": 0.4951,
+   "max_abs": 0.5,
+   "bias": 0.00066,
+   "corr": 1.0
+  }
+ },
+ "tolerances": {
+  "note": "The Kotlin engine may use Double or Float. Python (float64 here, float32 in production bilinear) agrees with the vectors to these absolute tolerances",
+  "daily_series": 1e-05,
+  "features_coarse": 0.0001,
+  "features_pixel": 0.001,
+  "trigger": 0.0001,
+  "score": 0.0002,
+  "pixel_rowcol": 0.01
+ }
+}

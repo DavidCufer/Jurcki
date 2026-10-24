@@ -1,0 +1,1112 @@
+{
+ "schema_version": 1,
+ "generated": "2026-10-24",
+ "habitat": {
+  "title": [
+   "Kje? Primernost rastišča",
+   "Where? Habitat suitability"
+  ],
+  "description": [
+   "Statični zemljevid primernosti (nadmorska višina, naklon, ekspozicija, pokritost z gozdom, tip gozda, rob gozda). Model je naučen na najdbah (GBIF/iNaturalist in ZGS) proti ozadju iz gozdnih celic in preverjen s prostorskimi bloki.",
+   "Static suitability map (elevation, slope, aspect, tree cover, forest type, forest edge). The model is trained on finds (GBIF/iNaturalist and SFI) against a forest-cell background and checked with spatial blocks."
+  ],
+  "final_variant": "full",
+  "final_blend_with_prior": false,
+  "block_km_main": 10.0,
+  "variants": {
+   "prior": {
+    "sl": "Pravila iz literature (prior)",
+    "en": "Literature rules (prior)"
+   },
+   "core": {
+    "sl": "Model: teren in pokrovnost",
+    "en": "Model: terrain and tree cover"
+   },
+   "full": {
+    "sl": "Model: teren, pokrovnost in tip gozda (v aplikaciji)",
+    "en": "Model: terrain, tree cover and forest type (used in the app)"
+   },
+   "blend_core": {
+    "sl": "Mešanica prior + model (teren)",
+    "en": "Blend prior + model (terrain)"
+   },
+   "blend_full": {
+    "sl": "Mešanica prior + model (s tipom gozda)",
+    "en": "Blend prior + model (with forest type)"
+   }
+  },
+  "units": {
+   "si_all": {
+    "sl": "Vse slovenske najdbe",
+    "en": "All Slovenian finds"
+   },
+   "si_dated": {
+    "sl": "Slovenske najdbe z datumom (GBIF)",
+    "en": "Slovenian dated finds (GBIF)"
+   },
+   "si_sfi": {
+    "sl": "Slovenske najdbe ZGS (samo leto, ~3 km)",
+    "en": "Slovenian SFI records (year only, ~3 km)"
+   },
+   "foreign_dated": {
+    "sl": "Najdbe v sosednjih državah z datumom",
+    "en": "Dated finds in neighbouring countries"
+   },
+   "foreign_sfi": {
+    "sl": "Najdbe ZGS v tujini",
+    "en": "SFI records abroad"
+   }
+  },
+  "cv": {
+   "10km": {
+    "prior": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.4645,
+      "hit_top10": 0.1048,
+      "hit_top20": 0.1921,
+      "fold_auc": [
+       0.45,
+       0.503,
+       0.547,
+       0.449,
+       0.36
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5574,
+      "hit_top10": 0.1791,
+      "hit_top20": 0.3134
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.4261,
+      "hit_top10": 0.0741,
+      "hit_top20": 0.142
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6131,
+      "hit_top10": 0.177,
+      "hit_top20": 0.2951
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.2511,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "core": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5638,
+      "hit_top10": 0.1354,
+      "hit_top20": 0.2795,
+      "fold_auc": [
+       0.564,
+       0.618,
+       0.545,
+       0.578,
+       0.488
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5523,
+      "hit_top10": 0.1045,
+      "hit_top20": 0.2537
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.5686,
+      "hit_top10": 0.1481,
+      "hit_top20": 0.2901
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6404,
+      "hit_top10": 0.177,
+      "hit_top20": 0.3607
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.4918,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "full": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.6202,
+      "hit_top10": 0.2052,
+      "hit_top20": 0.3537,
+      "fold_auc": [
+       0.556,
+       0.641,
+       0.637,
+       0.68,
+       0.547
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5914,
+      "hit_top10": 0.194,
+      "hit_top20": 0.3582
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.6321,
+      "hit_top10": 0.2099,
+      "hit_top20": 0.3519
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6528,
+      "hit_top10": 0.1967,
+      "hit_top20": 0.3705
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.5646,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "blend_core": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5153,
+      "hit_top10": 0.1135,
+      "hit_top20": 0.1747,
+      "fold_auc": [
+       0.497,
+       0.573,
+       0.544,
+       0.517,
+       0.418
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5727,
+      "hit_top10": 0.209,
+      "hit_top20": 0.3134
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.4916,
+      "hit_top10": 0.0741,
+      "hit_top20": 0.1173
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6503,
+      "hit_top10": 0.177,
+      "hit_top20": 0.3672
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.3381,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "blend_full": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5593,
+      "hit_top10": 0.1572,
+      "hit_top20": 0.2838,
+      "fold_auc": [
+       0.501,
+       0.603,
+       0.618,
+       0.591,
+       0.445
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5941,
+      "hit_top10": 0.2388,
+      "hit_top20": 0.3433
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.5449,
+      "hit_top10": 0.1235,
+      "hit_top20": 0.2593
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.663,
+      "hit_top10": 0.2164,
+      "hit_top20": 0.4164
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.3895,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    }
+   },
+   "20km": {
+    "prior": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.4599,
+      "hit_top10": 0.1179,
+      "hit_top20": 0.1878,
+      "fold_auc": [
+       0.541,
+       0.379,
+       0.361,
+       0.495,
+       0.515
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5544,
+      "hit_top10": 0.209,
+      "hit_top20": 0.3134
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.4209,
+      "hit_top10": 0.0802,
+      "hit_top20": 0.1358
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6167,
+      "hit_top10": 0.1738,
+      "hit_top20": 0.3115
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.3873,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "core": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5567,
+      "hit_top10": 0.1266,
+      "hit_top20": 0.2838,
+      "fold_auc": [
+       0.547,
+       0.553,
+       0.548,
+       0.607,
+       0.527
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5591,
+      "hit_top10": 0.1642,
+      "hit_top20": 0.2836
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.5557,
+      "hit_top10": 0.1111,
+      "hit_top20": 0.284
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6413,
+      "hit_top10": 0.2,
+      "hit_top20": 0.3574
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.5906,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "full": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.6029,
+      "hit_top10": 0.1659,
+      "hit_top20": 0.3013,
+      "fold_auc": [
+       0.602,
+       0.652,
+       0.527,
+       0.646,
+       0.578
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5856,
+      "hit_top10": 0.1642,
+      "hit_top20": 0.2836
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.6101,
+      "hit_top10": 0.1667,
+      "hit_top20": 0.3086
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6554,
+      "hit_top10": 0.2295,
+      "hit_top20": 0.3967
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.6676,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "blend_core": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5042,
+      "hit_top10": 0.1223,
+      "hit_top20": 0.2009,
+      "fold_auc": [
+       0.54,
+       0.447,
+       0.441,
+       0.547,
+       0.539
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5642,
+      "hit_top10": 0.2239,
+      "hit_top20": 0.2985
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.4793,
+      "hit_top10": 0.0802,
+      "hit_top20": 0.1605
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6497,
+      "hit_top10": 0.1967,
+      "hit_top20": 0.3639
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.4829,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    },
+    "blend_full": {
+     "si_all": {
+      "n": 229,
+      "auc": 0.5402,
+      "hit_top10": 0.1528,
+      "hit_top20": 0.2751,
+      "fold_auc": [
+       0.587,
+       0.511,
+       0.441,
+       0.575,
+       0.577
+      ]
+     },
+     "si_dated": {
+      "n": 67,
+      "auc": 0.5882,
+      "hit_top10": 0.2687,
+      "hit_top20": 0.3433
+     },
+     "si_sfi": {
+      "n": 162,
+      "auc": 0.5203,
+      "hit_top10": 0.1049,
+      "hit_top20": 0.2469
+     },
+     "foreign_dated": {
+      "n": 305,
+      "auc": 0.6621,
+      "hit_top10": 0.223,
+      "hit_top20": 0.4098
+     },
+     "foreign_sfi": {
+      "n": 1,
+      "auc": 0.5378,
+      "hit_top10": 0.0,
+      "hit_top20": 0.0
+     }
+    }
+   }
+  },
+  "n_units": {
+   "foreign_dated": 305,
+   "foreign_sfi": 1,
+   "si_dated": 67,
+   "si_sfi": 162
+  },
+  "importance": {
+   "ndvi_leafoff": 0.1689,
+   "elev": 0.1618,
+   "slope": 0.1564,
+   "forest_edge_dist": 0.1476,
+   "ndvi_summer": 0.1045,
+   "conifer_frac": 0.089,
+   "tpi2000": 0.0518,
+   "twi": 0.0427,
+   "northness": 0.0418,
+   "grassland": 0.0298,
+   "treecover": 0.0055
+  },
+  "sanity_final": {
+   "Pohorje": {
+    "mean_all": 0.68,
+    "mean_forest": 0.715,
+    "forest_share": 0.95
+   },
+   "Kocevski Rog": {
+    "mean_all": 0.512,
+    "mean_forest": 0.541,
+    "forest_share": 0.95
+   },
+   "Sneznik": {
+    "mean_all": 0.407,
+    "mean_forest": 0.411,
+    "forest_share": 0.99
+   },
+   "Pokljuka": {
+    "mean_all": 0.561,
+    "mean_forest": 0.598,
+    "forest_share": 0.94
+   },
+   "Goricko": {
+    "mean_all": 0.691,
+    "mean_forest": 0.774,
+    "forest_share": 0.89
+   },
+   "Haloze": {
+    "mean_all": 0.427,
+    "mean_forest": 0.555,
+    "forest_share": 0.77
+   },
+   "Ljubljansko barje": {
+    "mean_all": 0.45,
+    "mean_forest": 0.674,
+    "forest_share": 0.67
+   },
+   "Prekmurje fields": {
+    "mean_all": 0.25,
+    "mean_forest": 0.426,
+    "forest_share": 0.59
+   },
+   "above_1800m": {
+    "mean_all": 0.0186,
+    "max": 0.475,
+    "cells": 3201
+   },
+   "cropland>0.5 cells": {
+    "mean_all": 0.168,
+    "cells": 19829
+   },
+   "builtup>0.3 cells": {
+    "mean_all": 0.213,
+    "cells": 7751
+   },
+   "treecover<0.1 cells": {
+    "mean_all": 0.0,
+    "cells": 34774
+   },
+   "Slovenia_forest_mean": 0.588
+  }
+ },
+ "trigger": {
+  "title": [
+   "Kdaj? Sprožilec rasti",
+   "When? Fruiting trigger"
+  ],
+  "description": [
+   "Sprožilec iz vremena (povprečna temperatura 20 dni, padavine 26 dni, izdaten dež, vročina, zmrzal) krat sezonski faktor. Vsaka najdba se primerja z drugimi dnevi iste sezone (1. 5. - 15. 11.) na istem mestu v istem letu.",
+   "Weather trigger (20-day mean temperature, 26-day rain, soaking rain, heat, frost) times a seasonal factor. Each find is compared with the other days of the same season (1 May - 15 Nov) at the same place in the same year."
+  ],
+  "primary_metric": "comb_tol: mean temporal percentile of season x trigger, +-3 day tolerant, leave-one-year-out",
+  "recommended": "tuned",
+  "rows": [
+   {
+    "key": "season_only:comb_tol",
+    "sl": "Samo sezona (mesec)",
+    "en": "Season only (month)",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.6615,
+     "hit_top10": 0.3521,
+     "hit_top20": 0.3521
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.6516,
+     "hit_top10": 0.3071,
+     "hit_top20": 0.3071
+    }
+   },
+   {
+    "key": "literature:comb_tol",
+    "sl": "Literatura: sezona x vreme",
+    "en": "Literature: season x weather",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.6716,
+     "hit_top10": 0.2622,
+     "hit_top20": 0.4494
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.6517,
+     "hit_top10": 0.221,
+     "hit_top20": 0.3933
+    }
+   },
+   {
+    "key": "tuned_in_sample:comb_tol",
+    "sl": "Prilagojeni parametri (vsa leta, optimistično)",
+    "en": "Tuned parameters (all years, optimistic)",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.7333,
+     "hit_top10": 0.3333,
+     "hit_top20": 0.5206
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.719,
+     "hit_top10": 0.3034,
+     "hit_top20": 0.4719
+    }
+   },
+   {
+    "key": "tuned_loyo:comb_tol",
+    "sl": "Prilagojeni parametri, preverjeno na izpuščenem letu",
+    "en": "Tuned parameters, leave-one-year-out",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.7095,
+     "hit_top10": 0.2996,
+     "hit_top20": 0.4831
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.6995,
+     "hit_top10": 0.2697,
+     "hit_top20": 0.4307
+    }
+   },
+   {
+    "key": "lgbm_loyo:comb_tol",
+    "sl": "Strojno učenje (LightGBM), izpuščeno leto",
+    "en": "Machine learning (LightGBM), leave-one-year-out",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.708,
+     "hit_top10": 0.2734,
+     "hit_top20": 0.4644
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.7059,
+     "hit_top10": 0.2509,
+     "hit_top20": 0.4719
+    }
+   },
+   {
+    "key": "logit_loyo:comb_tol",
+    "sl": "Strojno učenje (logistična), izpuščeno leto",
+    "en": "Machine learning (logistic), leave-one-year-out",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.6829,
+     "hit_top10": 0.2697,
+     "hit_top20": 0.4157
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.6792,
+     "hit_top10": 0.2509,
+     "hit_top20": 0.397
+    }
+   },
+   {
+    "key": "literature:trig_tol",
+    "sl": "Literatura: samo vreme",
+    "en": "Literature: weather only",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.5846,
+     "hit_top10": 0.1798,
+     "hit_top20": 0.2509
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.5658,
+     "hit_top10": 0.1236,
+     "hit_top20": 0.2247
+    }
+   },
+   {
+    "key": "tuned_loyo:trig_tol",
+    "sl": "Prilagojeni parametri: samo vreme, izpuščeno leto",
+    "en": "Tuned: weather only, leave-one-year-out",
+    "tolerant_3d": {
+     "n": 267,
+     "auc": 0.6568,
+     "hit_top10": 0.2247,
+     "hit_top20": 0.3858
+    },
+    "exact_day": {
+     "n": 267,
+     "auc": 0.6541,
+     "hit_top10": 0.2097,
+     "hit_top20": 0.3483
+    }
+   }
+  ],
+  "ml_wins": false,
+  "ml_note": "Strojno učenje ni bistveno boljše od preprostega modela s parametri iz literature, zato aplikacija uporablja slednjega.",
+  "ml_note_en": "Machine learning is not clearly better than the simple parametric model, so the app uses the latter.",
+  "gain_ci_auc": {
+   "description": "mean AUC difference [mean, 5 %, 95 %], bootstrap over years",
+   "values": {
+    "tuned_minus_literature": [
+     0.0379,
+     0.004,
+     0.0708
+    ],
+    "tuned_minus_season": [
+     0.048,
+     0.0121,
+     0.0715
+    ],
+    "literature_minus_season": [
+     0.0101,
+     -0.0321,
+     0.0485
+    ]
+   }
+  },
+  "tuned_gain_loyo": 0.0379,
+  "n_finds": 267,
+  "n_series": 269,
+  "years": [
+   2010,
+   2011,
+   2012,
+   2013,
+   2014,
+   2015,
+   2016,
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025,
+   2026
+  ],
+  "n_candidates": 1000
+ },
+ "per_year": [
+  {
+   "year": 2010,
+   "n": 5,
+   "auc_tuned_loyo": 0.739,
+   "hit_top20_tuned_loyo": 0.6,
+   "auc_literature": 0.778,
+   "hit_top20_literature": 0.6,
+   "auc_season": 0.79,
+   "hit_top20_season": 0.6
+  },
+  {
+   "year": 2011,
+   "n": 5,
+   "auc_tuned_loyo": 0.526,
+   "hit_top20_tuned_loyo": 0.4,
+   "auc_literature": 0.467,
+   "hit_top20_literature": 0.2,
+   "auc_season": 0.657,
+   "hit_top20_season": 0.2
+  },
+  {
+   "year": 2012,
+   "n": 7,
+   "auc_tuned_loyo": 0.778,
+   "hit_top20_tuned_loyo": 0.714,
+   "auc_literature": 0.651,
+   "hit_top20_literature": 0.429,
+   "auc_season": 0.683,
+   "hit_top20_season": 0.143
+  },
+  {
+   "year": 2013,
+   "n": 5,
+   "auc_tuned_loyo": 0.95,
+   "hit_top20_tuned_loyo": 1.0,
+   "auc_literature": 0.729,
+   "hit_top20_literature": 0.2,
+   "auc_season": 0.924,
+   "hit_top20_season": 1.0
+  },
+  {
+   "year": 2014,
+   "n": 9,
+   "auc_tuned_loyo": 0.764,
+   "hit_top20_tuned_loyo": 0.667,
+   "auc_literature": 0.712,
+   "hit_top20_literature": 0.333,
+   "auc_season": 0.683,
+   "hit_top20_season": 0.333
+  },
+  {
+   "year": 2015,
+   "n": 2,
+   "auc_tuned_loyo": 0.943,
+   "hit_top20_tuned_loyo": 1.0,
+   "auc_literature": 0.978,
+   "hit_top20_literature": 1.0,
+   "auc_season": 0.924,
+   "hit_top20_season": 1.0
+  },
+  {
+   "year": 2016,
+   "n": 2,
+   "auc_tuned_loyo": 0.624,
+   "hit_top20_tuned_loyo": 0.5,
+   "auc_literature": 0.659,
+   "hit_top20_literature": 0.5,
+   "auc_season": 0.757,
+   "hit_top20_season": 0.5
+  },
+  {
+   "year": 2017,
+   "n": 8,
+   "auc_tuned_loyo": 0.875,
+   "hit_top20_tuned_loyo": 0.75,
+   "auc_literature": 0.854,
+   "hit_top20_literature": 0.875,
+   "auc_season": 0.821,
+   "hit_top20_season": 0.75
+  },
+  {
+   "year": 2018,
+   "n": 8,
+   "auc_tuned_loyo": 0.624,
+   "hit_top20_tuned_loyo": 0.375,
+   "auc_literature": 0.721,
+   "hit_top20_literature": 0.625,
+   "auc_season": 0.686,
+   "hit_top20_season": 0.375
+  },
+  {
+   "year": 2019,
+   "n": 11,
+   "auc_tuned_loyo": 0.427,
+   "hit_top20_tuned_loyo": 0.091,
+   "auc_literature": 0.496,
+   "hit_top20_literature": 0.364,
+   "auc_season": 0.68,
+   "hit_top20_season": 0.273
+  },
+  {
+   "year": 2020,
+   "n": 31,
+   "auc_tuned_loyo": 0.6,
+   "hit_top20_tuned_loyo": 0.194,
+   "auc_literature": 0.555,
+   "hit_top20_literature": 0.194,
+   "auc_season": 0.541,
+   "hit_top20_season": 0.194
+  },
+  {
+   "year": 2021,
+   "n": 5,
+   "auc_tuned_loyo": 0.703,
+   "hit_top20_tuned_loyo": 0.6,
+   "auc_literature": 0.66,
+   "hit_top20_literature": 0.6,
+   "auc_season": 0.602,
+   "hit_top20_season": 0.2
+  },
+  {
+   "year": 2022,
+   "n": 30,
+   "auc_tuned_loyo": 0.724,
+   "hit_top20_tuned_loyo": 0.433,
+   "auc_literature": 0.692,
+   "hit_top20_literature": 0.367,
+   "auc_season": 0.662,
+   "hit_top20_season": 0.5
+  },
+  {
+   "year": 2023,
+   "n": 38,
+   "auc_tuned_loyo": 0.625,
+   "hit_top20_tuned_loyo": 0.421,
+   "auc_literature": 0.483,
+   "hit_top20_literature": 0.263,
+   "auc_season": 0.564,
+   "hit_top20_season": 0.053
+  },
+  {
+   "year": 2024,
+   "n": 35,
+   "auc_tuned_loyo": 0.768,
+   "hit_top20_tuned_loyo": 0.571,
+   "auc_literature": 0.816,
+   "hit_top20_literature": 0.686,
+   "auc_season": 0.691,
+   "hit_top20_season": 0.257
+  },
+  {
+   "year": 2025,
+   "n": 42,
+   "auc_tuned_loyo": 0.759,
+   "hit_top20_tuned_loyo": 0.524,
+   "auc_literature": 0.728,
+   "hit_top20_literature": 0.548,
+   "auc_season": 0.7,
+   "hit_top20_season": 0.452
+  },
+  {
+   "year": 2026,
+   "n": 24,
+   "auc_tuned_loyo": 0.826,
+   "hit_top20_tuned_loyo": 0.625,
+   "auc_literature": 0.766,
+   "hit_top20_literature": 0.542,
+   "auc_season": 0.679,
+   "hit_top20_season": 0.583
+  }
+ ],
+ "per_year_note": {
+  "sl": "Preverjeno na izpuščenem letu: parametri so izbrani na drugih letih. hit_top20 = delež najdb med najboljšimi 20 % dni.",
+  "en": "Held-out: parameters chosen on the other years. hit_top20 = share of finds among the best 20 % of days."
+ },
+ "params": [
+  {
+   "name": "t_opt",
+   "unit": "degC",
+   "literature": 13.0,
+   "tuned": 17.6091,
+   "used_in_app": "tuned",
+   "sl": "Najboljša povprečna temperatura zraka v zadnjih 20 dneh. Literatura (Bielefeld) navaja 13 °C; naši podatki iz Slovenije in Avstrije kažejo višji optimum.",
+   "en": "Best mean air temperature over the last 20 days. The literature (Bielefeld) says 13 degC; our Slovenian and Austrian finds point to a higher optimum."
+  },
+  {
+   "name": "t_sd",
+   "unit": "degC",
+   "literature": 4.0,
+   "tuned": 6.83502,
+   "used_in_app": "tuned",
+   "sl": "Širina temperaturnega odziva: večja vrednost pomeni, da jurčki dobro prenašajo odmike od optimuma.",
+   "en": "Width of the temperature response: a larger value means more tolerance for departures from the optimum."
+  },
+  {
+   "name": "t_window",
+   "unit": "days",
+   "literature": 20,
+   "tuned": 20,
+   "used_in_app": "tuned",
+   "sl": "Število dni za povprečno temperaturo (fiksno).",
+   "en": "Number of days for the mean temperature (fixed)."
+  },
+  {
+   "name": "p_window",
+   "unit": "days",
+   "literature": 26,
+   "tuned": 26,
+   "used_in_app": "tuned",
+   "sl": "Število dni za seštevek padavin (fiksno).",
+   "en": "Number of days for the rain total (fixed)."
+  },
+  {
+   "name": "p_half",
+   "unit": "mm",
+   "literature": 60.0,
+   "tuned": 81.1179,
+   "used_in_app": "tuned",
+   "sl": "Količina padavin v 26 dneh, pri kateri je dež-del sprožilca 50 %. Več dežja pomeni višji sprožilec, vendar z zasičenjem.",
+   "en": "Rain over 26 days at which the rain part of the trigger reaches 50 %. More rain raises the trigger, with saturation."
+  },
+  {
+   "name": "pulse_min",
+   "unit": "mm per 3 days",
+   "literature": 20.0,
+   "tuned": 10.4639,
+   "used_in_app": "tuned",
+   "sl": "Padavine v 3 dneh, ki štejejo za izdatno namočitev tal.",
+   "en": "Rain in 3 days that counts as a soaking rain."
+  },
+  {
+   "name": "pulse_lag",
+   "unit": "days [lo, hi]",
+   "literature": [
+    7,
+    16
+   ],
+   "tuned": [
+    14,
+    19
+   ],
+   "used_in_app": "tuned",
+   "sl": "Koliko dni po izdatnem dežju se pojavijo plodovi: od-do.",
+   "en": "How many days after a soaking rain the fruiting bodies appear: from-to."
+  },
+  {
+   "name": "heat_tmax",
+   "unit": "degC",
+   "literature": 30.0,
+   "tuned": 28.803,
+   "used_in_app": "tuned",
+   "sl": "Najvišja dnevna temperatura v zadnjih 10 dneh, nad katero sprožilec pada (vročinski val zaduši rast).",
+   "en": "Daily maximum over the last 10 days above which the trigger drops (a heat spell suppresses fruiting)."
+  },
+  {
+   "name": "heat_window",
+   "unit": "days",
+   "literature": 10,
+   "tuned": 10,
+   "used_in_app": "tuned",
+   "sl": "Število dni za vročinski kazalnik (fiksno).",
+   "en": "Number of days for the heat indicator (fixed)."
+  },
+  {
+   "name": "frost_tmin",
+   "unit": "degC",
+   "literature": -1.0,
+   "tuned": -0.687025,
+   "used_in_app": "tuned",
+   "sl": "Najnižja nočna temperatura v zadnjih 7 dneh, pod katero sprožilec pada (slana).",
+   "en": "Lowest night temperature over the last 7 days below which the trigger drops (frost)."
+  },
+  {
+   "name": "frost_window",
+   "unit": "days",
+   "literature": 7,
+   "tuned": 7,
+   "used_in_app": "tuned",
+   "sl": "Število dni za kazalnik zmrzali (fiksno).",
+   "en": "Number of days for the frost indicator (fixed)."
+  }
+ ],
+ "weekend_effect": {
+  "n": 267,
+  "off_day_share": 0.4569,
+  "baseline_share": 0.3078,
+  "p_value": 2.23e-07,
+  "sl": "46% najdb je bilo zabeleženih ob vikendih in praznikih, čeprav je takih dni v sezoni 31%. Najdbe torej delno merijo, kdaj ljudje hodijo v gozd, ne le kdaj jurčki rastejo; zato so ocene modela nekoliko optimistične ali popačene.",
+  "en": "46% of finds were logged on weekends and public holidays, although such days are 31% of the season. The finds therefore partly measure when people go to the forest, not only when boletes fruit, which biases the backtest."
+ },
+ "data": {
+  "finds_2010plus_in_bounds": 248,
+  "duplicates_removed": 13,
+  "in_backtest": 242,
+  "by_country": {
+   "AT": 157,
+   "SI": 71,
+   "HR": 13,
+   "HU": 6,
+   "IT": 1
+  },
+  "by_source": {
+   "iNaturalist": 170,
+   "OMG": 67,
+   "Observation.org": 5,
+   "HNS": 4,
+   "NABU|naturgucker": 2
+  },
+  "by_species": {
+   "Boletus edulis": 142,
+   "Boletus reticulatus": 78,
+   "Boletus pinophilus": 20,
+   "Boletus aereus": 8
+  },
+  "by_year": {
+   "2010": 4,
+   "2011": 5,
+   "2012": 7,
+   "2013": 5,
+   "2014": 9,
+   "2015": 2,
+   "2016": 2,
+   "2017": 8,
+   "2018": 6,
+   "2019": 11,
+   "2020": 30,
+   "2021": 5,
+   "2022": 25,
+   "2023": 35,
+   "2024": 28,
+   "2025": 42,
+   "2026": 24
+  },
+  "years_covered": [
+   2010,
+   2026
+  ],
+  "habitat_training_units": {
+   "foreign_dated": 305,
+   "foreign_sfi": 1,
+   "si_dated": 67,
+   "si_sfi": 162
+  },
+  "habitat_training_note": {
+   "sl": "Model rastišča je naučen na datiranih najdbah GBIF in na zapisih Zavoda za gozdove Slovenije (samo leto, ~3 km natančnost); ti niso na zemljevidu najdb.",
+   "en": "The habitat model is trained on dated GBIF finds and on Slovenian Forestry Institute records (year only, ~3 km accuracy); the latter are not in the finds list."
+  },
+  "backtest_finds_total": 267,
+  "backtest_note": {
+   "sl": "Preizkus uporablja vse datirane najdbe 2010+ s koordinatno natančnostjo do 10 km v oknu ERA5 in v sezoni 1. 5. - 15. 11.; nekatere ležijo severno od zemljevida.",
+   "en": "The backtest uses all dated 2010+ finds with coordinate uncertainty up to 10 km inside the ERA5 window and the 1 May - 15 Nov season; a few lie north of the map."
+  }
+ },
+ "glossary": {
+  "auc": {
+   "sl": "AUC: verjetnost, da je prava najdba višje ocenjena kot naključna primerjava (0,5 = naključno, 1 = popolno). Pri 'kdaj' je primerjava z drugimi dnevi sezone na istem mestu, pri 'kje' z naključnimi gozdnimi celicami.",
+   "en": "AUC: the probability that a real find is ranked above a random comparison (0.5 = chance, 1 = perfect). For 'when' the comparison is the other days of the season at the same place; for 'where' random forest cells."
+  },
+  "top10": {
+   "sl": "Delež najdb, ki so med najboljšimi 10 % (dnevi ali celice).",
+   "en": "Share of finds that fall in the best 10 % (days or cells)."
+  },
+  "top20": {
+   "sl": "Delež najdb, ki so med najboljšimi 20 %.",
+   "en": "Share of finds that fall in the best 20 %."
+  },
+  "tol": {
+   "sl": "Toleranca ±3 dni: najdba se zabeleži z zamudo in plodovi rastejo več dni, zato se šteje najboljši rezultat v oknu ±3 dni.",
+   "en": "Tolerance ±3 days: a find is logged with a delay and a flush lasts several days, so the best score within ±3 days counts."
+  },
+  "loyo": {
+   "sl": "Izpuščeno leto (LOYO): za vsako leto so parametri izbrani na drugih letih in preverjeni na tem letu - poštena ocena.",
+   "en": "Leave-one-year-out (LOYO): for each year the parameters are chosen on the other years and tested on that year - an honest estimate."
+  },
+  "blocks": {
+   "sl": "Prostorski bloki: cele kvadratne regije (10 km) so pri učenju izpuščene in nato napovedane.",
+   "en": "Spatial blocks: whole square regions (10 km) are held out during training and then predicted."
+  }
+ }
+}
