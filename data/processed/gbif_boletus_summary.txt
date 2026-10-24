@@ -1,0 +1,134 @@
+GBIF snapshot 2026-10-01; raw rows 1690
+rows after cleaning: 547
+
+== species ==
+                       n
+species                 
+Boletus edulis       293
+Boletus reticulatus  135
+Boletus pinophilus    65
+Boletus aereus        40
+Boletus erythropus     8
+(genus only)           4
+Boletus satanoides     1
+Boletus atkinsonii     1
+
+== year ==
+is_jurcki  jurcki  other
+year                    
+1889.0          1      0
+1955.0          1      0
+1960.0          6      0
+1961.0          2      0
+1962.0          1      0
+1963.0          5      0
+1964.0          6      0
+1965.0          4      0
+1966.0          3      0
+1967.0          8      0
+1968.0          8      0
+1969.0          2      1
+1970.0          1      0
+1971.0          4      0
+1972.0          4      0
+1973.0          3      0
+1974.0          1      0
+1975.0          5      0
+1978.0          3      0
+1981.0          0      1
+1983.0          2      0
+1985.0          1      1
+1986.0          4      0
+1987.0          4      1
+1988.0          4      0
+1989.0          4      0
+1990.0          1      0
+1991.0          8      0
+1992.0          2      0
+1993.0         11      0
+1994.0         23      1
+1995.0          8      0
+1996.0          9      0
+1997.0          3      0
+1998.0         21      0
+1999.0         11      0
+2000.0          3      0
+2001.0          7      0
+2002.0         16      0
+2003.0          4      1
+2004.0          3      0
+2005.0          3      0
+2006.0          2      0
+2007.0          5      0
+2008.0         10      0
+2009.0          8      0
+2010.0          5      0
+2011.0          6      1
+2012.0          7      0
+2013.0          5      0
+2014.0          9      0
+2015.0          2      0
+2016.0          3      0
+2017.0          9      0
+2018.0          8      0
+2019.0         14      0
+2020.0         38      0
+2021.0          5      1
+2022.0         30      1
+2023.0         43      2
+2024.0         35      1
+2025.0         44      1
+2026.0         25      1
+
+== month ==
+         n
+month     
+4.0      3
+5.0     10
+6.0     64
+7.0     65
+8.0    108
+9.0    194
+10.0    94
+11.0     8
+12.0     1
+
+== country ==
+               n
+countrycode     
+AT           443
+SI            76
+HR            15
+HU            12
+IT             1
+
+== year_SI ==
+is_jurcki  jurcki  other
+year                    
+1955.0          1      0
+2011.0          0      1
+2012.0          1      0
+2013.0          3      0
+2017.0          5      0
+2019.0          2      0
+2020.0          3      0
+2021.0          1      0
+2022.0          3      0
+2023.0         11      1
+2024.0          9      1
+2025.0         23      0
+2026.0         10      1
+
+== dataset ==
+                                        n  n_jurcki       institution                                               title
+datasetkey                                                                                                               
+71d34a18-4dad-4d2d-9cb3-c1e91317faad  290       286               OMG                                                    
+50c9509d-22c7-4a22-a47d-8c48425ef4a7  196       196       iNaturalist             iNaturalist Research-grade Observations
+5830fa3c-497c-4d37-b771-bd6c84997f2c   24        24               GJO                                                    
+8a863029-f435-446a-821e-275f4f641165   14         6                    Observation.org, Nature data from around the World
+55b9ac33-0532-46d3-9796-c4c157f2b097   10        10            WU-MYC                                                    
+c1492854-5d15-40e9-9ee7-24a18ac05112    6         6               HNS                                                    
+6ac3f774-d9fb-4796-b3e9-92bf6c81c084    4         4  NABU|naturgucker                                                    
+84b18cce-083a-4464-bee8-25b2083a17cd    1         0               AMU                                                    
+897fb2c0-f762-11e1-a439-00145eb45e9a    1         0               GEO                                                    
+89579e3e-f762-11e1-a439-00145eb45e9a    1         1          ZRC-SAZU                                                    
