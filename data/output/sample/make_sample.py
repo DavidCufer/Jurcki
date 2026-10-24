@@ -15,8 +15,9 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parent
-BOUNDS = [13.37, 45.42, 16.61, 46.88]  # minLon, minLat, maxLon, maxLat (EPSG:4326)
-PX_DEG = 0.01  # ~1 km pixels: tiny, but plenty for testing
+BOUNDS = [13.37, 45.42, 16.61, 46.88]  # minLon, minLat, maxLon, maxLat (EPSG:4326), adjusted below
+PX_DEG = 0.01  # ~1 km pixels: tiny, but plenty for testing (columns: degrees of longitude)
+R = 6378137.0  # Web Mercator sphere radius: the contract wants rows spaced in EPSG:3857
 FIRST_DAY = date(2026, 10, 24)
 N_DAYS = 4
 LEGEND = [[0.0, "#FFF7BC"], [0.35, "#FEC44F"], [0.65, "#EC7014"], [1.0, "#7F0000"]]
@@ -29,11 +30,22 @@ OUTLINE = [
     (13.95, 45.48), (13.70, 45.45),
 ]
 
+def _my(lat_deg):
+    return R * np.log(np.tan(np.pi / 4 + np.radians(lat_deg) / 2))
+
+
+def _lat(y):
+    return np.degrees(2 * np.arctan(np.exp(y / R)) - np.pi / 2)
+
+
 rng = np.random.default_rng(42)
 W = int(round((BOUNDS[2] - BOUNDS[0]) / PX_DEG))
-H = int(round((BOUNDS[3] - BOUNDS[1]) / PX_DEG))
+PX_M = R * np.radians(PX_DEG)                              # square pixels in Mercator metres
+y_bot = _my(BOUNDS[1])
+H = int(np.ceil((_my(BOUNDS[3]) - y_bot) / PX_M))
+BOUNDS[3] = round(float(_lat(y_bot + H * PX_M)), 6)        # bounds = outer pixel edges
 lon = BOUNDS[0] + (np.arange(W) + 0.5) * PX_DEG          # column -> lon
-lat = BOUNDS[3] - (np.arange(H) + 0.5) * PX_DEG          # row 0 = north
+lat = _lat(y_bot + (H - np.arange(H) - 0.5) * PX_M)      # row 0 = north, Mercator-spaced
 LON, LAT = np.meshgrid(lon, lat)
 
 
@@ -49,7 +61,7 @@ def blobs(n: int, sigma_lo: float, sigma_hi: float) -> np.ndarray:
 
 # mask
 img = Image.new("L", (W, H), 0)
-px = [((x - BOUNDS[0]) / PX_DEG, (BOUNDS[3] - y) / PX_DEG) for x, y in OUTLINE]
+px = [((x - BOUNDS[0]) / PX_DEG, (_my(BOUNDS[3]) - _my(y)) / PX_M) for x, y in OUTLINE]
 ImageDraw.Draw(img).polygon(px, fill=255)
 MASK = np.asarray(img) > 0
 
@@ -128,8 +140,10 @@ reports = [
 }, ensure_ascii=False), encoding="utf-8")
 
 (OUT / "meta.json").write_text(json.dumps({
-    "generated": f"{FIRST_DAY.isoformat()}T06:00:00Z",
+    "schema_version": 1,
+    "generated": f"{FIRST_DAY.isoformat()}T06:00:00+00:00",
     "days": days,
+    "first_forecast_day": days[1],
     "bounds": BOUNDS,
     "legend": LEGEND,
 }, ensure_ascii=False, indent=2), encoding="utf-8")

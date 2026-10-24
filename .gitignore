@@ -16,3 +16,4 @@ android/app/build/
 android/local.properties
 *.apk
 data/processed/*.csv
+data/output/demo/
