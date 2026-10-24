@@ -10,7 +10,8 @@ from . import config, grid
 CMAPS = {"elev": "terrain", "slope": "magma", "northness": "RdBu_r", "eastness": "RdBu_r",
          "tpi500": "RdBu_r", "tpi2000": "RdBu_r", "twi": "viridis_r", "tri": "magma",
          "treecover": "Greens", "grassland": "YlGn", "cropland": "YlOrBr",
-         "builtup": "Greys", "forest_edge_dist": "PuOr"}
+         "builtup": "Greys", "forest_edge_dist": "PuOr", "conifer_frac": "YlGn",
+         "ndvi_summer": "Greens", "ndvi_leafoff": "viridis", "forest_type_valid": "Greys"}
 SYMMETRIC = {"northness", "eastness", "tpi500", "tpi2000", "forest_edge_dist"}
 
 
