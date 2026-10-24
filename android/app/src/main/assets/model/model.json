@@ -23,20 +23,20 @@
   "lonlat_to_rowcol": "col = (r_earth * rad(lon) - x0) / px;  row = (y_top - r_earth * ln(tan(pi/4 + rad(lat)/2))) / px;  pixel = (floor(row), floor(col)); centres are at +0.5",
   "files": {
    "habitat": {
-    "file": "habitat.u8.gz",
+    "file": "habitat.u8.bin",
     "dtype": "uint8",
     "value": "habitat = byte / 250 (0..1)",
     "nodata": 255,
     "scale": 250.0
    },
    "elev": {
-    "file": "elev.i16.gz",
+    "file": "elev.i16.bin",
     "dtype": "int16 little endian",
     "value": "metres above sea level",
     "nodata": -32768
    },
    "mask": {
-    "file": "mask.u8.gz",
+    "file": "mask.u8.bin",
     "dtype": "uint8",
     "value": "1 = Slovenia land, 0 = outside"
    }

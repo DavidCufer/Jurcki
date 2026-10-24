@@ -11,9 +11,9 @@ test vectors generated from the production code paths::
 Outputs
 -------
 ``android/app/src/main/assets/model/``
-    ``habitat.u8.gz``  uint8, habitat 0..1 -> 0..250, 255 = nodata / outside Slovenia
-    ``elev.i16.gz``    int16 little endian, metres, -32768 = nodata
-    ``mask.u8.gz``     uint8, 1 = Slovenia land
+    ``habitat.u8.bin``  uint8, habitat 0..1 -> 0..250, 255 = nodata / outside Slovenia
+    ``elev.i16.bin``    int16 little endian, metres, -32768 = nodata
+    ``mask.u8.bin``     uint8, 1 = Slovenia land
     ``model.json``     the engine spec (parameters, weather request, formulas, geometry)
     ``stats.json``     numbers + texts of the app's "model / success" screen
     ``finds.json``     dated finds 2010+ with their backtest values
@@ -139,8 +139,8 @@ def build_rasters(geo: dict | None = None) -> dict:
     return {"habitat": hab_u8, "elev": elev_i16, "mask": mask}
 
 
-RASTER_FILES = {"habitat": ("habitat.u8.gz", "<u1"), "elev": ("elev.i16.gz", "<i2"),
-                "mask": ("mask.u8.gz", "<u1")}
+RASTER_FILES = {"habitat": ("habitat.u8.bin", "<u1"), "elev": ("elev.i16.bin", "<i2"),
+                "mask": ("mask.u8.bin", "<u1")}
 
 
 def write_rasters(rasters: dict, out_dir: Path) -> dict:

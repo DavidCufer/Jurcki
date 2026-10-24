@@ -49,6 +49,14 @@ jobs:
       - name: Unit tests and debug APK
         run: ./gradlew --no-daemon --stacktrace --continue testDebugUnitTest assembleDebug
 
+      # Asset names can be changed by the packager (e.g. *.gz); fail if any model file is missing.
+      - name: Check model assets in APK
+        run: |
+          apk=$(ls app/build/outputs/apk/debug/*.apk | head -1)
+          for f in model.json habitat.u8.bin elev.i16.bin mask.u8.bin finds.json stats.json; do
+            unzip -l "$apk" | grep -q "assets/model/$f\$" || { echo "missing assets/model/$f in $apk"; exit 1; }
+          done
+
       - name: Upload unit test report
         if: failure()
         uses: actions/upload-artifact@v4

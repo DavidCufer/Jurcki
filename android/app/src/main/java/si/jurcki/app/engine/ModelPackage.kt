@@ -204,14 +204,17 @@ class ModelPackage(
         const val HABITAT_SCALE = 250.0f
         const val ELEV_NODATA = -32768
 
-        /** Reads the four files via [open] (name relative to `assets/model/`). */
+        /**
+         * Reads the four files via [open] (name relative to `assets/model/`). Rasters use a `.bin`
+         * extension: the Android asset packager treats `*.gz` assets specially and renames them.
+         */
         fun load(open: (String) -> InputStream): ModelPackage {
             fun bytes(name: String): ByteArray = open(name).use { it.readBytes() }
             return parse(
                 String(bytes("model.json"), Charsets.UTF_8),
-                bytes("habitat.u8.gz"),
-                bytes("elev.i16.gz"),
-                bytes("mask.u8.gz"),
+                bytes("habitat.u8.bin"),
+                bytes("elev.i16.bin"),
+                bytes("mask.u8.bin"),
             )
         }
 
@@ -273,7 +276,10 @@ class ModelPackage(
             )
         }
 
-        private fun gunzip(gz: ByteArray): ByteArray =
-            GZIPInputStream(ByteArrayInputStream(gz)).use { it.readBytes() }
+        /** Gunzips [gz]; data without the gzip magic bytes is returned as is. */
+        private fun gunzip(gz: ByteArray): ByteArray {
+            val isGzip = gz.size >= 2 && gz[0] == 0x1f.toByte() && gz[1] == 0x8b.toByte()
+            return if (isGzip) GZIPInputStream(ByteArrayInputStream(gz)).use { it.readBytes() } else gz
+        }
     }
 }

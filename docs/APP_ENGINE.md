@@ -28,9 +28,9 @@ Open-Meteo (3 requests, 120 coarse points) -> daily series per point -> gap fill
 
 | file | content |
 |---|---|
-| `habitat.u8.gz` | uint8, habitat 0..1 stored as `round(h * 250)` (0..250), **255 = nodata** (outside Slovenia) |
-| `elev.i16.gz` | int16 little endian, metres, **-32768 = nodata** (outside Slovenia) |
-| `mask.u8.gz` | uint8, 1 = Slovenia land, 0 = outside |
+| `habitat.u8.bin` | uint8, habitat 0..1 stored as `round(h * 250)` (0..250), **255 = nodata** (outside Slovenia) |
+| `elev.i16.bin` | int16 little endian, metres, **-32768 = nodata** (outside Slovenia) |
+| `mask.u8.bin` | uint8, 1 = Slovenia land, 0 = outside |
 | `model.json` | everything below in machine-readable form |
 | `stats.json` | texts and numbers of the "model / success" screen (sl + en) |
 | `finds.json` | dated finds 2010+ with backtest values |
