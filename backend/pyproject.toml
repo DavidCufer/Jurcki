@@ -1,0 +1,44 @@
+[project]
+name = "jurcki"
+version = "0.1.0"
+description = "Boletus (jurčki) fruiting prediction for Slovenia"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "xarray",
+  "rasterio",
+  "rioxarray",
+  "pyproj",
+  "shapely",
+  "geopandas",
+  "scipy",
+  "scikit-learn",
+  "lightgbm",
+  "duckdb",
+  "requests",
+  "fsspec",
+  "s3fs",
+  "gcsfs",
+  "zarr",
+  "h5netcdf",
+  "netCDF4",
+  "beautifulsoup4",
+  "pillow",
+  "matplotlib",
+  "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+jurcki = "jurcki.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["jurcki*"]
