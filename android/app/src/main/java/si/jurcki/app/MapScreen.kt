@@ -42,23 +42,31 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -116,9 +124,13 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.sources.ImageSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.Point
+import si.jurcki.app.engine.Find
+import si.jurcki.app.engine.HistoryPlan
+import si.jurcki.app.engine.Hotspot
+import si.jurcki.app.engine.LegendStop
+import si.jurcki.app.engine.topPercent
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -156,9 +168,11 @@ private const val SRC_SCORE = "jurcki-score-src"
 private const val LYR_SCORE = "jurcki-score"
 private const val SRC_HOT = "jurcki-hotspots-src"
 private const val LYR_HOT = "jurcki-hotspots"
-private const val SRC_REP = "jurcki-reports-src"
-private const val LYR_REP = "jurcki-reports"
-private const val IMG_REPORT = "jurcki-report-icon"
+private const val SRC_NEAR = "jurcki-finds-near-src"
+private const val LYR_NEAR = "jurcki-finds-near"
+private const val SRC_ALL = "jurcki-finds-all-src"
+private const val LYR_ALL = "jurcki-finds-all"
+private const val IMG_FIND = "jurcki-find-icon"
 private const val EMPTY_FC = """{"type":"FeatureCollection","features":[]}"""
 
 private val SLOVENIA_CENTER = LatLng(46.12, 14.82)
@@ -170,7 +184,7 @@ private const val SLOVENIA_ZOOM = 8.0
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
+fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit, onOpenStats: () -> Unit) {
     val context = LocalContext.current
     val density = LocalDensity.current.density
     val mapView = rememberMapView()
@@ -178,6 +192,7 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
     var map by remember { mutableStateOf<MapLibreMap?>(null) }
     var style by remember { mutableStateOf<Style?>(null) }
     var panelOpen by rememberSaveable { mutableStateOf(true) }
+    var showPicker by rememberSaveable { mutableStateOf(false) }
 
     var locationGranted by remember { mutableStateOf(hasLocationPermission(context)) }
     var locationActive by remember { mutableStateOf(false) }
@@ -221,7 +236,7 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
             BaseMap.TOPO -> Style.Builder().fromJson(STYLE_TOPO_JSON)
         }
         // Offline and the style is not cached: fall back to a plain background so that the
-        // forecast overlay, hotspots and finds still show up.
+        // score overlay, hotspots and finds still show up.
         var fellBack = false
         val failListener = MapView.OnDidFailLoadingMapListener { message ->
             if (!fellBack && style == null) {
@@ -240,43 +255,52 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
     }
 
     // --- overlays: every effect (re)creates the layers if the style was replaced ---------------
-    val bounds = state.meta?.bounds
-    val legend = state.legend
+    val bounds = state.bounds
 
     LaunchedEffect(style, state.overlay, bounds) {
         val st = style ?: return@LaunchedEffect
         guarded {
             ensureLayers(st, density)
-            applyScore(st, state.overlay, bounds, state.settings.opacity, state.showForecast)
+            applyScore(st, state.overlay, bounds, state.settings.opacity, state.showScore)
         }
     }
     LaunchedEffect(style, state.settings.opacity) {
         val st = style ?: return@LaunchedEffect
         guarded { st.getLayer(LYR_SCORE)?.setProperties(rasterOpacity(state.settings.opacity)) }
     }
-    LaunchedEffect(style, state.hotspots, legend) {
+    LaunchedEffect(style, state.hotspots, state.colorMap) {
         val st = style ?: return@LaunchedEffect
+        val cm = state.colorMap ?: return@LaunchedEffect
         guarded {
             ensureLayers(st, density)
             val src: GeoJsonSource? = st.getSourceAs(SRC_HOT)
-            src?.setGeoJson(hotspotsToGeoJson(state.hotspots, legend))
+            src?.setGeoJson(hotspotsToGeoJson(state.hotspots, cm))
         }
     }
-    LaunchedEffect(style, state.reports) {
+    LaunchedEffect(style, state.nearFinds) {
         val st = style ?: return@LaunchedEffect
         guarded {
             ensureLayers(st, density)
-            val src: GeoJsonSource? = st.getSourceAs(SRC_REP)
-            src?.setGeoJson(reportsToGeoJson(state.reports))
+            val src: GeoJsonSource? = st.getSourceAs(SRC_NEAR)
+            src?.setGeoJson(findsToGeoJson(state.nearFinds))
         }
     }
-    LaunchedEffect(style, state.showForecast, state.showHotspots, state.showReports) {
+    LaunchedEffect(style, state.allFinds) {
         val st = style ?: return@LaunchedEffect
         guarded {
             ensureLayers(st, density)
-            setVisible(st, LYR_SCORE, state.showForecast)
+            val src: GeoJsonSource? = st.getSourceAs(SRC_ALL)
+            src?.setGeoJson(findsToGeoJson(state.allFinds))
+        }
+    }
+    LaunchedEffect(style, state.showScore, state.showHotspots, state.showNearFinds, state.showAllFinds) {
+        val st = style ?: return@LaunchedEffect
+        guarded {
+            ensureLayers(st, density)
+            setVisible(st, LYR_SCORE, state.showScore)
             setVisible(st, LYR_HOT, state.showHotspots)
-            setVisible(st, LYR_REP, state.showReports)
+            setVisible(st, LYR_NEAR, state.showNearFinds)
+            setVisible(st, LYR_ALL, state.showAllFinds)
         }
     }
 
@@ -337,7 +361,7 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
-        // Top: day selector + settings
+        // Top: day chips + stats + settings
         Row(
             Modifier
                 .align(Alignment.TopCenter)
@@ -358,14 +382,17 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    items(state.meta?.days ?: emptyList()) { day ->
+                    items(state.days) { chip ->
                         FilterChip(
-                            selected = day == state.selectedDay,
-                            onClick = { vm.selectDay(day) },
-                            label = { Text(dayLabel(day)) },
+                            selected = chip.date == state.selectedDay,
+                            onClick = { vm.selectDay(chip.date) },
+                            label = { Text(dayLabel(chip.date, state.mode) + if (chip.forecast) " *" else "") },
                         )
                     }
                 }
+            }
+            SmallFloatingActionButton(onClick = onOpenStats) {
+                Icon(Icons.Default.Info, contentDescription = stringResource(R.string.action_stats))
             }
             SmallFloatingActionButton(onClick = onOpenSettings) {
                 Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.action_settings))
@@ -412,10 +439,11 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
                 vm = vm,
                 open = panelOpen,
                 onToggleOpen = { panelOpen = !panelOpen },
+                onPickDate = { showPicker = true },
             )
         }
 
-        if (state.loading) {
+        if (state.loading || state.computing) {
             LinearProgressIndicator(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -424,15 +452,26 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
         }
     }
 
-    // --- bottom sheet for tapped hotspot / report ----------------------------------------------
+    if (showPicker) {
+        HistoryDatePickerDialog(
+            initial = runCatching { LocalDate.parse(state.historyDate) }.getOrDefault(HistoryPlan.today()),
+            onPick = { d ->
+                showPicker = false
+                vm.setHistoryDate(d)
+            },
+            onDismiss = { showPicker = false },
+        )
+    }
+
+    // --- bottom sheet for tapped hotspot / find ------------------------------------------------
     state.selection?.let { selection ->
         ModalBottomSheet(
             onDismissRequest = { vm.clearSelection() },
             sheetState = rememberModalBottomSheetState(),
         ) {
             when (selection) {
-                is Selection.OfHotspot -> HotspotSheet(selection.hotspot, legend)
-                is Selection.OfReport -> ReportSheet(selection.report)
+                is Selection.OfHotspot -> HotspotSheet(selection.hotspot, state)
+                is Selection.OfFind -> FindSheet(selection.find)
             }
         }
     }
@@ -443,7 +482,13 @@ fun MapScreen(state: UiState, vm: MainViewModel, onOpenSettings: () -> Unit) {
 // ---------------------------------------------------------------------------------------------
 
 @Composable
-private fun ControlPanel(state: UiState, vm: MainViewModel, open: Boolean, onToggleOpen: () -> Unit) {
+private fun ControlPanel(
+    state: UiState,
+    vm: MainViewModel,
+    open: Boolean,
+    onToggleOpen: () -> Unit,
+    onPickDate: () -> Unit,
+) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
@@ -452,45 +497,84 @@ private fun ControlPanel(state: UiState, vm: MainViewModel, open: Boolean, onTog
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    val generated = state.meta?.generated?.takeIf { it.isNotBlank() }?.let { formatGenerated(it) } ?: "-"
-                    when (state.status) {
-                        Status.OK ->
-                            Text(stringResource(R.string.status_updated, generated), style = MaterialTheme.typography.labelMedium)
-                        Status.OFFLINE ->
-                            Text(
-                                stringResource(R.string.status_offline, generated),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        Status.NO_DATA ->
-                            Text(
-                                stringResource(R.string.status_no_data),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        Status.LOADING_FIRST -> Unit
+                    val progress = state.progress
+                    if (progress != null) {
+                        Text(progressText(progress), style = MaterialTheme.typography.labelMedium)
+                    } else if (state.computing) {
+                        Text(stringResource(R.string.progress_computing), style = MaterialTheme.typography.labelMedium)
                     }
-                    val detail = state.detail
-                    if (detail != null && state.status != Status.OK) {
+                    val err = state.error
+                    if (err != null) {
                         Text(
-                            stringResource(R.string.status_error_detail, detail),
+                            errorText(err),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    val note = state.note
+                    if (note != null && progress == null) {
+                        Text(
+                            noteText(note),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = if (note.stale) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    val chip = state.days.firstOrNull { it.date == state.selectedDay }
+                    if (chip != null && chip.forecast) {
+                        Text(
+                            stringResource(R.string.day_is_forecast),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    if (state.overlay == null && state.meta != null && !state.loading) {
+                    val season = state.season
+                    val mean = state.meanScore
+                    if (season != null && mean != null && progress == null) {
                         Text(
-                            stringResource(R.string.status_no_overlay),
+                            stringResource(R.string.day_stats, season, mean),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                }
+                if (state.error != null && state.ready && !state.loading) {
+                    TextButton(onClick = { vm.refresh() }) { Text(stringResource(R.string.action_retry)) }
                 }
                 IconButton(onClick = onToggleOpen) {
                     Icon(
                         imageVector = if (open) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
                         contentDescription = stringResource(if (open) R.string.action_collapse else R.string.action_expand),
                     )
+                }
+            }
+
+            // Mode: forecast / history
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                FilterChip(
+                    selected = state.mode == Mode.FORECAST,
+                    onClick = { vm.setMode(Mode.FORECAST) },
+                    label = { Text(stringResource(R.string.mode_forecast)) },
+                )
+                FilterChip(
+                    selected = state.mode == Mode.HISTORY,
+                    onClick = { vm.setMode(Mode.HISTORY) },
+                    label = { Text(stringResource(R.string.mode_history)) },
+                )
+            }
+
+            if (state.mode == Mode.HISTORY) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(onClick = { vm.shiftHistoryDate(-7) }) { Text("‹‹") }
+                    IconButton(onClick = { vm.shiftHistoryDate(-1) }) { Text("‹") }
+                    OutlinedButton(onClick = onPickDate, modifier = Modifier.weight(1f)) {
+                        Text(formatDate(state.historyDate))
+                    }
+                    IconButton(onClick = { vm.shiftHistoryDate(1) }) { Text("›") }
+                    IconButton(onClick = { vm.shiftHistoryDate(7) }) { Text("››") }
                 }
             }
 
@@ -510,8 +594,8 @@ private fun ControlPanel(state: UiState, vm: MainViewModel, open: Boolean, onTog
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     FilterChip(
-                        selected = state.showForecast,
-                        onClick = { vm.setShowForecast(!state.showForecast) },
+                        selected = state.showScore,
+                        onClick = { vm.setShowScore(!state.showScore) },
                         label = { Text(stringResource(R.string.layer_forecast)) },
                     )
                     FilterChip(
@@ -519,10 +603,17 @@ private fun ControlPanel(state: UiState, vm: MainViewModel, open: Boolean, onTog
                         onClick = { vm.setShowHotspots(!state.showHotspots) },
                         label = { Text(stringResource(R.string.layer_hotspots)) },
                     )
+                    if (state.mode == Mode.HISTORY) {
+                        FilterChip(
+                            selected = state.showNearFinds,
+                            onClick = { vm.setShowNearFinds(!state.showNearFinds) },
+                            label = { Text(stringResource(R.string.layer_finds_near, state.nearFinds.size)) },
+                        )
+                    }
                     FilterChip(
-                        selected = state.showReports,
-                        onClick = { vm.setShowReports(!state.showReports) },
-                        label = { Text(stringResource(R.string.layer_reports)) },
+                        selected = state.showAllFinds,
+                        onClick = { vm.setShowAllFinds(!state.showAllFinds) },
+                        label = { Text(stringResource(R.string.layer_finds_all)) },
                     )
                     Spacer(Modifier.width(8.dp))
                     FilterChip(
@@ -536,8 +627,10 @@ private fun ControlPanel(state: UiState, vm: MainViewModel, open: Boolean, onTog
                         label = { Text(stringResource(R.string.base_map_topo)) },
                     )
                 }
-                Spacer(Modifier.height(8.dp))
-                Legend(state.legend)
+                if (state.legend.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    Legend(state.legend)
+                }
             }
         }
     }
@@ -549,7 +642,7 @@ private fun Legend(legend: List<LegendStop>) {
     val max = legend.last().value
     val range = (max - min).takeIf { it > 0.0 } ?: 1.0
     val stops = legend
-        .map { (((it.value - min) / range).toFloat()) to Color(it.color) }
+        .map { (((it.value - min) / range).toFloat()) to Color(it.argb) }
         .toTypedArray()
     Column(Modifier.fillMaxWidth()) {
         Text(stringResource(R.string.legend_title), style = MaterialTheme.typography.labelMedium)
@@ -563,11 +656,11 @@ private fun Legend(legend: List<LegendStop>) {
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
-                "${stringResource(R.string.legend_low)} (${"%.1f".format(min)})",
+                "${stringResource(R.string.legend_low)} (${"%.1f".format(Locale.US, min)})",
                 style = MaterialTheme.typography.labelSmall,
             )
             Text(
-                "${stringResource(R.string.legend_high)} (${"%.1f".format(max)})",
+                "${stringResource(R.string.legend_high)} (${"%.1f".format(Locale.US, max)})",
                 style = MaterialTheme.typography.labelSmall,
             )
         }
@@ -575,8 +668,47 @@ private fun Legend(legend: List<LegendStop>) {
 }
 
 @Composable
-private fun HotspotSheet(h: Hotspot, legend: List<LegendStop>) {
+private fun HistoryDatePickerDialog(initial: LocalDate, onPick: (LocalDate) -> Unit, onDismiss: () -> Unit) {
+    val today = remember { HistoryPlan.today() }
+    val startMs = remember(initial) { initial.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() }
+    val pickerState = rememberDatePickerState(
+        initialSelectedDateMillis = startMs,
+        yearRange = HistoryPlan.MIN_DATE.year..today.year,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val d = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                return !d.isBefore(HistoryPlan.MIN_DATE) && !d.isAfter(today)
+            }
+
+            override fun isSelectableYear(year: Int): Boolean = year >= HistoryPlan.MIN_DATE.year && year <= today.year
+        },
+    )
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val ms = pickerState.selectedDateMillis
+                    if (ms != null) {
+                        onPick(Instant.ofEpochMilli(ms).atZone(ZoneOffset.UTC).toLocalDate())
+                    } else {
+                        onDismiss()
+                    }
+                },
+            ) { Text(stringResource(R.string.action_ok)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    ) {
+        DatePicker(state = pickerState)
+    }
+}
+
+@Composable
+private fun HotspotSheet(h: Hotspot, state: UiState) {
     val context = LocalContext.current
+    val cm = state.colorMap
     Column(
         Modifier
             .fillMaxWidth()
@@ -586,19 +718,26 @@ private fun HotspotSheet(h: Hotspot, legend: List<LegendStop>) {
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            val argb = cm?.argb(h.score) ?: 0
             Box(
                 Modifier
                     .size(18.dp)
-                    .background(Color(legend.colorAt(h.score)), CircleShape),
+                    .background(Color(argb or (0xFF shl 24)), CircleShape),
             )
             Spacer(Modifier.width(10.dp))
             Text(stringResource(R.string.hotspot_title), style = MaterialTheme.typography.headlineSmall)
         }
-        InfoRow(stringResource(R.string.field_score), "%.2f".format(h.score))
-        h.habitat?.let { InfoRow(stringResource(R.string.field_habitat), "%.2f".format(it)) }
-        h.trigger?.let { InfoRow(stringResource(R.string.field_trigger), "%.2f".format(it)) }
-        h.elev?.let { InfoRow(stringResource(R.string.field_elevation), stringResource(R.string.unit_meters, it.roundToInt())) }
+        state.selectedDay?.let { InfoRow(stringResource(R.string.field_date), formatDate(it)) }
+        InfoRow(stringResource(R.string.field_score), "%.2f".format(Locale.US, h.score))
+        InfoRow(stringResource(R.string.field_habitat), "%.2f".format(Locale.US, h.habitat))
+        InfoRow(stringResource(R.string.field_trigger), "%.2f".format(Locale.US, h.trigger))
+        InfoRow(stringResource(R.string.field_elevation), stringResource(R.string.unit_meters, h.elev.roundToInt()))
         InfoRow(stringResource(R.string.field_coordinates), coords(h.lat, h.lon))
+        Text(
+            stringResource(R.string.hotspot_explain),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Spacer(Modifier.height(4.dp))
         Button(onClick = { navigateTo(context, h.lat, h.lon) }) {
             Text(stringResource(R.string.action_navigate))
@@ -607,7 +746,7 @@ private fun HotspotSheet(h: Hotspot, legend: List<LegendStop>) {
 }
 
 @Composable
-private fun ReportSheet(r: Report) {
+private fun FindSheet(f: Find) {
     val context = LocalContext.current
     Column(
         Modifier
@@ -617,20 +756,54 @@ private fun ReportSheet(r: Report) {
             .navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Text(stringResource(R.string.report_title), style = MaterialTheme.typography.headlineSmall)
-        r.date?.let { InfoRow(stringResource(R.string.field_date), it) }
-        r.source?.let { InfoRow(stringResource(R.string.field_source), it) }
-        r.precisionM?.let {
-            InfoRow(stringResource(R.string.field_precision), "~" + stringResource(R.string.unit_meters, it.roundToInt()))
+        Text(stringResource(R.string.find_title), style = MaterialTheme.typography.headlineSmall)
+        InfoRow(stringResource(R.string.field_date), formatDate(f.date))
+        if (f.species.isNotEmpty()) InfoRow(stringResource(R.string.field_species), f.species)
+        f.source?.let { InfoRow(stringResource(R.string.field_source), it) }
+        f.country?.let { InfoRow(stringResource(R.string.field_country), it) }
+        f.precisionM?.let {
+            InfoRow(stringResource(R.string.field_precision), "~" + stringResource(R.string.unit_meters, it))
         }
-        InfoRow(stringResource(R.string.field_coordinates), coords(r.lat, r.lon))
-        Text(
-            text = r.text ?: stringResource(R.string.report_no_text),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 4.dp),
-        )
+        InfoRow(stringResource(R.string.field_coordinates), coords(f.lat, f.lon))
+
+        HorizontalDivider(Modifier.padding(vertical = 4.dp))
+        Text(stringResource(R.string.find_backtest_title), style = MaterialTheme.typography.titleSmall)
+        f.habitat?.let {
+            InfoRow(stringResource(R.string.field_habitat), "%.2f".format(Locale.US, it))
+            Text(
+                stringResource(R.string.find_habitat_explain),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        val ps = f.pSeasonTrigger
+        val pt = f.pTrigger
+        if (ps != null) {
+            Text(
+                stringResource(R.string.find_backtest_season, topPercent(ps)),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        if (pt != null) {
+            Text(
+                stringResource(R.string.find_backtest_weather, topPercent(pt)),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        if (ps == null && pt == null) {
+            Text(
+                stringResource(R.string.find_not_in_backtest),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        } else {
+            Text(
+                stringResource(R.string.find_backtest_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(Modifier.height(4.dp))
-        Button(onClick = { navigateTo(context, r.lat, r.lon) }) {
+        Button(onClick = { navigateTo(context, f.lat, f.lon) }) {
             Text(stringResource(R.string.action_navigate))
         }
     }
@@ -646,16 +819,48 @@ private fun InfoRow(label: String, value: String) {
 }
 
 @Composable
-private fun dayLabel(day: String): String {
+private fun progressText(p: Progress): String = when (p.kind) {
+    ProgressKind.LOADING_MODEL -> stringResource(R.string.progress_model)
+    ProgressKind.WEATHER -> stringResource(R.string.progress_weather, minOf(p.done + 1, p.total), p.total)
+    ProgressKind.WAIT_RATE_LIMIT -> stringResource(R.string.progress_wait, p.waitSeconds)
+    ProgressKind.COMPUTING -> stringResource(R.string.progress_computing)
+}
+
+@Composable
+private fun errorText(e: AppError): String {
+    val detail = e.detail ?: ""
+    return when (e.kind) {
+        ErrorKind.NO_NETWORK -> stringResource(R.string.error_no_network) + if (detail.isNotEmpty()) " ($detail)" else ""
+        ErrorKind.RATE_LIMIT -> stringResource(R.string.error_rate_limit)
+        ErrorKind.API -> stringResource(R.string.error_api, detail)
+        ErrorKind.BAD_RESPONSE -> stringResource(R.string.error_bad_response, detail)
+        ErrorKind.PACKAGE -> stringResource(R.string.error_package, detail)
+        ErrorKind.OTHER -> stringResource(R.string.error_other, detail)
+    }
+}
+
+@Composable
+private fun noteText(n: DataNote): String {
+    val time = formatDateTime(n.fetchedAtMillis)
+    return when {
+        n.stale -> stringResource(R.string.note_stale, time)
+        n.source == DataSource.ERA5 -> stringResource(R.string.note_era5)
+        n.source == DataSource.FORECAST_FOR_HISTORY -> stringResource(R.string.note_forecast_for_history, time)
+        else -> stringResource(R.string.note_forecast, time)
+    }
+}
+
+@Composable
+private fun dayLabel(day: String, mode: Mode): String {
     val date = try {
         LocalDate.parse(day)
     } catch (e: Exception) {
         return day
     }
     val today = LocalDate.now()
-    return when (date) {
-        today -> stringResource(R.string.day_today)
-        today.plusDays(1) -> stringResource(R.string.day_tomorrow)
+    return when {
+        mode == Mode.FORECAST && date == today -> stringResource(R.string.day_today)
+        mode == Mode.FORECAST && date == today.plusDays(1) -> stringResource(R.string.day_tomorrow)
         else -> date.format(DateTimeFormatter.ofPattern("EEE d. M.", Locale.getDefault()))
     }
 }
@@ -714,8 +919,30 @@ private inline fun guarded(block: () -> Unit) {
     }
 }
 
-/** Creates the hotspot and report sources/layers if the (new) style does not have them yet. */
+/** Creates the hotspot and find sources/layers if the (new) style does not have them yet. */
 private fun ensureLayers(style: Style, density: Float) {
+    if (style.getSource(SRC_ALL) == null) {
+        // All finds of any year: small translucent dots (habitat context), hidden by default.
+        style.addSource(GeoJsonSource(SRC_ALL, EMPTY_FC))
+        style.addLayer(
+            CircleLayer(LYR_ALL, SRC_ALL).withProperties(
+                circleRadius(
+                    Expression.interpolate(
+                        Expression.linear(),
+                        Expression.zoom(),
+                        Expression.stop(6, 2f),
+                        Expression.stop(10, 4f),
+                        Expression.stop(14, 6f),
+                    ),
+                ),
+                circleColor("#6A1B9A"),
+                circleOpacity(0.6f),
+                circleStrokeWidth(0.8f),
+                circleStrokeColor("#FFFFFF"),
+                visibility(Property.NONE),
+            ),
+        )
+    }
     if (style.getSource(SRC_HOT) == null) {
         style.addSource(GeoJsonSource(SRC_HOT, EMPTY_FC))
         style.addLayer(
@@ -736,12 +963,13 @@ private fun ensureLayers(style: Style, density: Float) {
             ),
         )
     }
-    if (style.getSource(SRC_REP) == null) {
-        style.addImage(IMG_REPORT, createReportIcon(density))
-        style.addSource(GeoJsonSource(SRC_REP, EMPTY_FC))
+    if (style.getSource(SRC_NEAR) == null) {
+        // Finds within +-7 days of the selected day (history mode): purple diamonds.
+        style.addImage(IMG_FIND, createFindIcon(density))
+        style.addSource(GeoJsonSource(SRC_NEAR, EMPTY_FC))
         style.addLayer(
-            SymbolLayer(LYR_REP, SRC_REP).withProperties(
-                iconImage(IMG_REPORT),
+            SymbolLayer(LYR_NEAR, SRC_NEAR).withProperties(
+                iconImage(IMG_FIND),
                 iconSize(1f),
                 iconAllowOverlap(true),
                 iconIgnorePlacement(true),
@@ -750,7 +978,7 @@ private fun ensureLayers(style: Style, density: Float) {
     }
 }
 
-/** Adds/updates the score PNG as an ImageSource placed by the 4 corners of `bounds`. */
+/** Adds/updates the score bitmap as an ImageSource placed by the 4 corners of `bounds`. */
 private fun applyScore(style: Style, bitmap: Bitmap?, bounds: Bounds?, opacity: Float, visible: Boolean) {
     if (bitmap == null || bounds == null) {
         style.removeLayer(LYR_SCORE)
@@ -775,8 +1003,8 @@ private fun applyScore(style: Style, bitmap: Bitmap?, bounds: Bounds?, opacity: 
         visibility(if (visible) Property.VISIBLE else Property.NONE),
     )
     // Keep place names readable: insert the heat map below the first label layer of the base style.
-    val firstLabel = style.layers.firstOrNull { it is SymbolLayer && it.id != LYR_REP }?.id
-    style.addLayerBelow(layer, firstLabel ?: LYR_HOT)
+    val firstLabel = style.layers.firstOrNull { it is SymbolLayer && it.id != LYR_NEAR }?.id
+    style.addLayerBelow(layer, firstLabel ?: LYR_ALL)
 }
 
 private fun setVisible(style: Style, layerId: String, visible: Boolean) {
@@ -784,7 +1012,7 @@ private fun setVisible(style: Style, layerId: String, visible: Boolean) {
 }
 
 /** Purple diamond with white outline, so finds look different from the round hotspot circles. */
-private fun createReportIcon(density: Float): Bitmap {
+private fun createFindIcon(density: Float): Bitmap {
     val size = (26 * density).roundToInt()
     val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
@@ -810,20 +1038,25 @@ private fun createReportIcon(density: Float): Bitmap {
     return bmp
 }
 
-/** Picks the report/hotspot nearest to the tap within a finger-sized rectangle. */
+/** Picks the find/hotspot nearest to the tap within a finger-sized rectangle. */
 private fun handleTap(map: MapLibreMap, tap: LatLng, density: Float, vm: MainViewModel): Boolean {
     val pt = map.projection.toScreenLocation(tap)
     val r = 24f * density
     val rect = RectF(pt.x - r, pt.y - r, pt.x + r, pt.y + r)
 
-    val reportIdx = nearestIdx(map.queryRenderedFeatures(rect, LYR_REP), tap)
-    if (reportIdx != null) {
-        vm.selectReport(reportIdx)
+    val nearIdx = nearestIdx(map.queryRenderedFeatures(rect, LYR_NEAR), tap)
+    if (nearIdx != null) {
+        vm.selectNearFind(nearIdx)
         return true
     }
     val hotspotIdx = nearestIdx(map.queryRenderedFeatures(rect, LYR_HOT), tap)
     if (hotspotIdx != null) {
         vm.selectHotspot(hotspotIdx)
+        return true
+    }
+    val allIdx = nearestIdx(map.queryRenderedFeatures(rect, LYR_ALL), tap)
+    if (allIdx != null) {
+        vm.selectAnyFind(allIdx)
         return true
     }
     return false
@@ -864,15 +1097,17 @@ private fun navigateTo(context: Context, lat: Double, lon: Double) {
     }
 }
 
-private fun formatGenerated(s: String): String {
-    val fmt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-    return try {
-        OffsetDateTime.parse(s).atZoneSameInstant(ZoneId.systemDefault()).format(fmt)
+private fun formatDate(iso: String): String =
+    try {
+        LocalDate.parse(iso).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     } catch (e: Exception) {
-        try {
-            LocalDateTime.parse(s).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).format(fmt)
-        } catch (e2: Exception) {
-            s
-        }
+        iso
     }
-}
+
+private fun formatDateTime(millis: Long): String =
+    try {
+        Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
+    } catch (e: Exception) {
+        "-"
+    }

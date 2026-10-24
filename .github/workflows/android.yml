@@ -45,10 +45,24 @@ jobs:
       - name: Set up Gradle (caching)
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build debug APK
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
+      # JVM unit tests (engine parity vectors, no network) first, then the APK.
+      - name: Unit tests and debug APK
+        run: ./gradlew --no-daemon --stacktrace --continue testDebugUnitTest assembleDebug
 
+      - name: Upload unit test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: |
+            android/app/build/reports/tests/
+            android/app/build/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # --continue builds the APK even when a unit test fails (the step is still red).
       - name: Upload APK
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: jurcki-debug-apk

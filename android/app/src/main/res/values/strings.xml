@@ -2,68 +2,131 @@
 <!-- Slovenian is the default language; English lives in values-en/strings.xml. -->
 <resources>
     <string name="app_name">Jurčki</string>
-
-    <string name="action_settings">Nastavitve</string>
+    <string name="action_settings">O aplikaciji</string>
+    <string name="action_stats">Model / uspešnost</string>
     <string name="action_refresh">Osveži podatke</string>
     <string name="action_my_location">Moja lokacija</string>
     <string name="action_back">Nazaj</string>
     <string name="action_collapse">Skrij ploščo</string>
     <string name="action_expand">Pokaži ploščo</string>
-
+    <string name="action_ok">V redu</string>
+    <string name="action_cancel">Prekliči</string>
+    <string name="action_retry">Poskusi znova</string>
+    <string name="action_navigate">Navigiraj</string>
+    <string name="no_navigation_app">Ni aplikacije za navigacijo.</string>
     <string name="base_map_streets">Ulice</string>
     <string name="base_map_topo">Teren</string>
-    <string name="layer_forecast">Napoved</string>
+    <string name="mode_forecast">Napoved</string>
+    <string name="mode_history">Zgodovina</string>
+    <string name="layer_forecast">Ocena</string>
     <string name="layer_hotspots">Žarišča</string>
-    <string name="layer_reports">Najdbe</string>
-    <string name="opacity_label">Neprosojnost napovedi: %1$d %%</string>
+    <string name="layer_finds_near">Najdbe ±7 dni (%1$d)</string>
+    <string name="layer_finds_all">Vse najdbe</string>
+    <string name="opacity_label">Neprosojnost ocene: %1$d %%</string>
     <string name="day_today">Danes</string>
     <string name="day_tomorrow">Jutri</string>
-
+    <string name="day_is_forecast">Izbrani dan je napoved (označen z *): modelski podatki, ne meritve.</string>
+    <string name="day_stats">Sezonski faktor %1$.2f · povprečna ocena %2$.2f</string>
     <string name="legend_title">Legenda</string>
     <string name="legend_low">nizka</string>
     <string name="legend_high">visoka</string>
-
-    <string name="status_updated">Podatki: %1$s</string>
-    <string name="status_offline">Brez povezave – prikazani so shranjeni podatki (%1$s)</string>
-    <string name="status_no_data">Ni podatkov. Preverite povezavo in nastavitve.</string>
-    <string name="status_no_overlay">Za ta dan ni slike napovedi.</string>
-    <string name="status_error_detail">Napaka: %1$s</string>
-
+    <string name="progress_model">Nalagam model …</string>
+    <string name="progress_weather">Prenašam vreme (%1$d/%2$d) …</string>
+    <string name="progress_wait">Open-Meteo omejuje število zahtev, čakam še %1$d s …</string>
+    <string name="progress_computing">Računam zemljevid …</string>
+    <string name="error_no_network">Ni povezave z Open-Meteo. Preverite internet.</string>
+    <string name="error_rate_limit">Open-Meteo je začasno zavrnil zahteve (omejitev). Poskusite čez nekaj minut.</string>
+    <string name="error_api">Napaka Open-Meteo: %1$s</string>
+    <string name="error_bad_response">Nepričakovan odgovor vremenskega strežnika: %1$s</string>
+    <string name="error_package">Modela ni mogoče naložiti: %1$s</string>
+    <string name="error_other">Napaka: %1$s</string>
+    <string name="note_forecast">Napoved Open-Meteo, prenesena %1$s</string>
+    <string name="note_stale">Brez povezave: prikazani so shranjeni podatki iz %1$s</string>
+    <string name="note_era5">Zgodovina: ERA5 reanaliza (Open-Meteo)</string>
+    <string name="note_forecast_for_history">Zadnji teden: napovedni podatki Open-Meteo (%1$s), ERA5 še ni na voljo</string>
     <string name="hotspot_title">Žarišče</string>
-    <string name="report_title">Najdba</string>
+    <string name="hotspot_explain">Žarišče je najboljši piksel (~250 m) v krogu ~1,5 km. Ocena 1,0 pomeni zelo redko odlično kombinacijo rastišča, sezone in vremena.</string>
+    <string name="find_title">Najdba</string>
     <string name="field_score">Ocena</string>
     <string name="field_habitat">Rastišče</string>
     <string name="field_trigger">Vremenski sprožilec</string>
     <string name="field_elevation">Nadmorska višina</string>
     <string name="field_date">Datum</string>
+    <string name="field_species">Vrsta</string>
     <string name="field_source">Vir</string>
+    <string name="field_country">Država</string>
     <string name="field_precision">Natančnost lokacije</string>
     <string name="field_coordinates">Koordinate</string>
     <string name="unit_meters">%1$d m</string>
-    <string name="action_navigate">Navigiraj</string>
-    <string name="no_navigation_app">Ni aplikacije za navigacijo.</string>
-    <string name="report_no_text">(brez besedila)</string>
-
+    <string name="find_backtest_title">Kaj je model napovedal za to najdbo</string>
+    <string name="find_habitat_explain">Rastišče: 0 = neprimerno, 1 = zelo primerno (statični zemljevid).</string>
+    <string name="find_backtest_season">Dan najdbe je bil med zgornjimi %1$d %% dni sezone na tem mestu (sezona × vreme).</string>
+    <string name="find_backtest_weather">Samo po vremenu: med zgornjimi %1$d %% dni.</string>
+    <string name="find_backtest_note" formatted="false">Preverjeno na izpuščenem letu (model te najdbe pri učenju ni videl). Naključen model bi bil v povprečju v zgornjih 50 %.</string>
+    <string name="find_not_in_backtest">Ta najdba ni del preizkusa modela (datum izven sezone 1. 5.–15. 11. ali premalo natančna lokacija).</string>
     <string name="location_permission_denied">Dovoljenje za lokacijo ni odobreno.</string>
     <string name="location_searching">Iščem lokacijo …</string>
     <string name="location_unavailable">Lokacije ni mogoče določiti.</string>
-
-    <string name="settings_title">Nastavitve</string>
-    <string name="settings_data_section">Podatki</string>
-    <string name="settings_base_url">Osnovni naslov podatkov</string>
-    <string name="settings_base_url_help">Mapa, v kateri so meta.json, score_*.png, hotspots_*.geojson in reports.geojson.</string>
-    <string name="settings_token">GitHub dostopni žeton (neobvezno)</string>
-    <string name="settings_token_help">Za zasebni repozitorij: žeton z dovoljenjem za branje vsebine. Pošlje se kot Authorization: Bearer.</string>
-    <string name="settings_token_show">Pokaži</string>
-    <string name="settings_token_hide">Skrij</string>
-    <string name="settings_save">Shrani in osveži</string>
-    <string name="settings_reset_url">Ponastavi naslov</string>
-    <string name="settings_cache_section">Shranjeni podatki</string>
-    <string name="settings_cache_generated">Zadnji podatki: %1$s</string>
-    <string name="settings_cache_days">Dnevi: %1$s</string>
-    <string name="settings_cache_none">Ni shranjenih podatkov.</string>
+    <string name="about_title">O aplikaciji in podatkih</string>
+    <string name="about_how_title">Kako deluje</string>
+    <string name="about_how_text">Aplikacija vse izračuna sama na telefonu: iz vremena (Open-Meteo), višine terena in zemljevida rastišč oceni vsak piksel (~250 m). Ocena = rastišče × sezona × vremenski sprožilec. Strežnika ni in ničesar ni treba nastavljati.</string>
+    <string name="about_data_title">Podatki</string>
+    <string name="about_data_text">Vreme: Open-Meteo.com (napoved in reanaliza ERA5, 120 točk po Sloveniji). Napoved se osveži največ na 3 ure, zgodovina se shrani trajno. Najdbe: GBIF/iNaturalist in drugi viri.</string>
+    <string name="about_model_created">Model zgrajen: %1$s</string>
+    <string name="about_clear_cache">Počisti shranjeno vreme</string>
+    <string name="about_cache_help">Po čiščenju se vreme ob naslednjem prikazu znova prenese.</string>
+    <string name="about_weather_attribution">Vremenski podatki: Open-Meteo.com (CC BY 4.0). ERA5: Copernicus Climate Change Service / ECMWF.</string>
     <string name="settings_maps_section">Zemljevidi</string>
     <string name="settings_attribution">Podlaga: OpenFreeMap, © OpenMapTiles, podatki © prispevalci OpenStreetMap. Teren: © prispevalci OpenStreetMap, SRTM | slog: © OpenTopoMap (CC-BY-SA).</string>
+    <string name="stats_title">Model / uspešnost</string>
+    <string name="stats_unavailable">Statistika ni na voljo.</string>
+    <string name="stats_generated">Statistika: %1$s</string>
+    <string name="stats_card_where">Kje? Rastišče</string>
+    <string name="stats_card_when">Kdaj? Sprožilec</string>
+    <string name="stats_card_hits" formatted="false">Zadetki med najboljšimi 20 %</string>
+    <string name="stats_prior">Pravila iz literature</string>
+    <string name="stats_model">Naš model</string>
+    <string name="stats_where_caption">Prostorski bloki po %1$d km, %2$d slovenskih najdb. Višje je bolje; 0,5 = ugibanje.</string>
+    <string name="stats_when_caption">%1$d datiranih najdb; vsaka je primerjana z drugimi dnevi iste sezone na istem mestu, preverjeno na izpuščenem letu.</string>
+    <string name="stats_gain">Dobitek prilagojenih parametrov proti samo sezoni: AUC %1$s (interval 5–95 %%: %2$s do %3$s).</string>
+    <string name="stats_hits_explain" formatted="false">Kolikšen delež najdb leži med najboljšimi 20 % celic (kje) oziroma dni (kdaj)?</string>
+    <string name="stats_hits_chance" formatted="false">Navpična črta = 20 %: toliko bi zadel naključni model.</string>
+    <string name="stats_row_season">Samo sezona (mesec)</string>
+    <string name="stats_row_literature">Literatura: sezona × vreme</string>
+    <string name="stats_row_tuned">Prilagojeni parametri (izpuščeno leto)</string>
+    <string name="stats_row_season_short">Sezona</string>
+    <string name="stats_row_literature_short">Liter.</string>
+    <string name="stats_row_tuned_short">Prilag.</string>
+    <string name="stats_auc_title">Kaj pomeni AUC?</string>
+    <string name="stats_auc_text">AUC pove, kako pogosto model pravo najdbo oceni višje kot naključno primerjavo (drug kraj ali drug dan sezone). Mera ne potrebuje praga in je poštena tudi pri redkih najdbah.</string>
+    <string name="stats_auc_05">0,5 = ugibanje (met kovanca)</string>
+    <string name="stats_auc_07">0,7 = dobro za tako težko nalogo</string>
+    <string name="stats_auc_10">1,0 = popolno</string>
+    <string name="stats_auc_note">Najdbe nastanejo tam in takrat, ko ljudje hodijo v gozd, zato so številke le približna ocena.</string>
+    <string name="stats_habitat_table">Rastišče po vrsti najdb (bloki %1$d km), AUC</string>
+    <string name="stats_importance_title">Kaj šteje pri rastišču (pomembnost lastnosti)</string>
+    <string name="stats_trigger_table">Primerjava pristopov (toleranca ±3 dni)</string>
+    <string name="stats_col_auc">AUC</string>
+    <string name="stats_col_top10" formatted="false">Top 10 %</string>
+    <string name="stats_col_top20" formatted="false">Top 20 %</string>
+    <string name="stats_col_year">Leto</string>
+    <string name="stats_per_year_title">Po letih (izpuščeno leto)</string>
+    <string name="stats_per_year_bars">AUC po letih (črta = 0,5)</string>
+    <string name="stats_params_title">Parametri sprožilca</string>
+    <string name="stats_param_lit">Literatura</string>
+    <string name="stats_param_used">V aplikaciji</string>
+    <string name="stats_weekend_title">Učinek vikenda</string>
+    <string name="stats_weekend_finds">Najdbe ob vikendih in praznikih</string>
+    <string name="stats_weekend_season">Takih dni v sezoni</string>
+    <string name="stats_data_title">Podatki o najdbah</string>
+    <string name="stats_data_totals">Najdbe 2010+ na zemljevidu: %1$d · odstranjeni dvojniki: %2$d · v preizkusu: %3$d</string>
+    <string name="stats_by_country">Po državah</string>
+    <string name="stats_by_species">Po vrstah</string>
+    <string name="stats_by_source">Po virih</string>
+    <string name="stats_by_year">Po letih</string>
+    <string name="stats_glossary_title">Slovar</string>
+    <string name="stats_term_tol">Toleranca ±3 dni</string>
+    <string name="stats_term_blocks">Prostorski bloki</string>
 
     <string name="attribution_streets" translatable="false">© OpenFreeMap © OpenMapTiles Data from OpenStreetMap</string>
     <string name="attribution_topo" translatable="false">© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)</string>

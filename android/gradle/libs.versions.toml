@@ -15,6 +15,9 @@ okhttp = "4.12.0"
 # OpenGL ES flavour of MapLibre Native Android (the plain `android-sdk` artifact is the Vulkan build
 # with a <uses-feature vulkan required="true"> that would hide the app from non-Vulkan devices).
 maplibre = "13.7.1"
+# JVM unit tests: Android's org.json is a stub in local unit tests, so the real library is added for tests only.
+junit = "4.13.2"
+orgJson = "20240303"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -30,6 +33,8 @@ compose-material-icons-core = { module = "androidx.compose.material:material-ico
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 maplibre-android = { module = "org.maplibre.gl:android-sdk-opengl", version.ref = "maplibre" }
+junit = { module = "junit:junit", version.ref = "junit" }
+org-json = { module = "org.json:json", version.ref = "orgJson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

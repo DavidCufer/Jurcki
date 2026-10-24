@@ -15,7 +15,7 @@ import java.io.IOException
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-/** Persists [AppSettings] (data URL, optional token, overlay opacity, base map) in DataStore. */
+/** Persists [AppSettings] (overlay opacity, base map) in DataStore. */
 class SettingsStore(context: Context) {
     private val store = context.applicationContext.dataStore
 
@@ -23,19 +23,10 @@ class SettingsStore(context: Context) {
         .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
         .map { p ->
             AppSettings(
-                baseUrl = p[KEY_URL]?.takeIf { it.isNotBlank() } ?: DEFAULT_BASE_URL,
-                token = p[KEY_TOKEN] ?: "",
                 opacity = p[KEY_OPACITY] ?: 0.7f,
                 baseMap = runCatching { BaseMap.valueOf(p[KEY_BASE_MAP] ?: "") }.getOrDefault(BaseMap.STREETS),
             )
         }
-
-    suspend fun setConnection(baseUrl: String, token: String) {
-        store.edit {
-            it[KEY_URL] = baseUrl
-            it[KEY_TOKEN] = token
-        }
-    }
 
     suspend fun setOpacity(value: Float) {
         store.edit { it[KEY_OPACITY] = value }
@@ -46,8 +37,6 @@ class SettingsStore(context: Context) {
     }
 
     private companion object {
-        val KEY_URL = stringPreferencesKey("base_url")
-        val KEY_TOKEN = stringPreferencesKey("token")
         val KEY_OPACITY = floatPreferencesKey("opacity")
         val KEY_BASE_MAP = stringPreferencesKey("base_map")
     }
