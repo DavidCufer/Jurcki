@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Slovenian is the default language; English lives in values-en/strings.xml. -->
+<resources>
+    <string name="app_name">Jurčki</string>
+
+    <string name="action_settings">Nastavitve</string>
+    <string name="action_refresh">Osveži podatke</string>
+    <string name="action_my_location">Moja lokacija</string>
+    <string name="action_back">Nazaj</string>
+    <string name="action_collapse">Skrij ploščo</string>
+    <string name="action_expand">Pokaži ploščo</string>
+
+    <string name="base_map_streets">Ulice</string>
+    <string name="base_map_topo">Teren</string>
+    <string name="layer_forecast">Napoved</string>
+    <string name="layer_hotspots">Žarišča</string>
+    <string name="layer_reports">Najdbe</string>
+    <string name="opacity_label">Neprosojnost napovedi: %1$d %%</string>
+    <string name="day_today">Danes</string>
+    <string name="day_tomorrow">Jutri</string>
+
+    <string name="legend_title">Legenda</string>
+    <string name="legend_low">nizka</string>
+    <string name="legend_high">visoka</string>
+
+    <string name="status_updated">Podatki: %1$s</string>
+    <string name="status_offline">Brez povezave – prikazani so shranjeni podatki (%1$s)</string>
+    <string name="status_no_data">Ni podatkov. Preverite povezavo in nastavitve.</string>
+    <string name="status_no_overlay">Za ta dan ni slike napovedi.</string>
+    <string name="status_error_detail">Napaka: %1$s</string>
+
+    <string name="hotspot_title">Žarišče</string>
+    <string name="report_title">Najdba</string>
+    <string name="field_score">Ocena</string>
+    <string name="field_habitat">Rastišče</string>
+    <string name="field_trigger">Vremenski sprožilec</string>
+    <string name="field_elevation">Nadmorska višina</string>
+    <string name="field_date">Datum</string>
+    <string name="field_source">Vir</string>
+    <string name="field_precision">Natančnost lokacije</string>
+    <string name="field_coordinates">Koordinate</string>
+    <string name="unit_meters">%1$d m</string>
+    <string name="action_navigate">Navigiraj</string>
+    <string name="no_navigation_app">Ni aplikacije za navigacijo.</string>
+    <string name="report_no_text">(brez besedila)</string>
+
+    <string name="location_permission_denied">Dovoljenje za lokacijo ni odobreno.</string>
+    <string name="location_searching">Iščem lokacijo …</string>
+    <string name="location_unavailable">Lokacije ni mogoče določiti.</string>
+
+    <string name="settings_title">Nastavitve</string>
+    <string name="settings_data_section">Podatki</string>
+    <string name="settings_base_url">Osnovni naslov podatkov</string>
+    <string name="settings_base_url_help">Mapa, v kateri so meta.json, score_*.png, hotspots_*.geojson in reports.geojson.</string>
+    <string name="settings_token">GitHub dostopni žeton (neobvezno)</string>
+    <string name="settings_token_help">Za zasebni repozitorij: žeton z dovoljenjem za branje vsebine. Pošlje se kot Authorization: Bearer.</string>
+    <string name="settings_token_show">Pokaži</string>
+    <string name="settings_token_hide">Skrij</string>
+    <string name="settings_save">Shrani in osveži</string>
+    <string name="settings_reset_url">Ponastavi naslov</string>
+    <string name="settings_cache_section">Shranjeni podatki</string>
+    <string name="settings_cache_generated">Zadnji podatki: %1$s</string>
+    <string name="settings_cache_days">Dnevi: %1$s</string>
+    <string name="settings_cache_none">Ni shranjenih podatkov.</string>
+    <string name="settings_maps_section">Zemljevidi</string>
+    <string name="settings_attribution">Podlaga: OpenFreeMap, © OpenMapTiles, podatki © prispevalci OpenStreetMap. Teren: © prispevalci OpenStreetMap, SRTM | slog: © OpenTopoMap (CC-BY-SA).</string>
+
+    <string name="attribution_streets" translatable="false">© OpenFreeMap © OpenMapTiles Data from OpenStreetMap</string>
+    <string name="attribution_topo" translatable="false">© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)</string>
+</resources>

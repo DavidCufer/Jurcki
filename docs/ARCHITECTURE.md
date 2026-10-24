@@ -55,10 +55,16 @@ data/output/       app-facing outputs (committed or published)
 ## App data contract (`data/output/`)
 
 * `meta.json` contains
-  `{"generated": ISO8601, "days": ["2026-10-24", ...], "bounds": [minLon, minLat, maxLon, maxLat], "legend": [[0.0,"#..."],...]}`
-* `score_YYYY-MM-DD.png` is an RGBA heat map in EPSG:4326 covering `bounds`.
-  It is transparent where the score is ~0 or outside Slovenia.
-* `hotspots_YYYY-MM-DD.geojson` holds the top cells as points, with
-  properties `score`, `habitat`, `trigger` and `elev`.
-* `reports.geojson` holds recent finds from forums and GBIF, with properties
-  `date`, `source`, `precision_m` and `text`.
+  `{"schema_version": 1, "generated": ISO8601 with offset, "days": ["2026-10-24", ...], "first_forecast_day": "2026-10-25", "bounds": [minLon, minLat, maxLon, maxLat], "legend": [[0.0,"#..."],...]}`
+  `bounds` are the outer pixel edges of every PNG.
+* `score_YYYY-MM-DD.png` is an RGBA heat map, north-up, with row 0 at maxLat.
+  Rows are spaced in **Web Mercator (EPSG:3857)** so that MapLibre's image
+  quad places them exactly. It is transparent where the score is ~0 or
+  outside Slovenia. Every day in `days` has a PNG.
+* `hotspots_YYYY-MM-DD.geojson` holds the top cells as points, sorted by
+  descending score, with properties `score`, `habitat` and `trigger` (all in
+  0..1) and `elev` (metres). A missing file means there are no hotspots.
+* `reports.geojson` holds recent finds from forums and GBIF. Properties:
+  `date` (YYYY-MM-DD), `source` (`gbif`, `forum` or `news`), and
+  `precision_m`, `text` and `url`, any of which may be null.
+* Legend values and every score are in 0..1.
