@@ -23,6 +23,7 @@ dependencies = [
   "gcsfs",
   "zarr",
   "h5netcdf",
+  "h5py",
   "netCDF4",
   "beautifulsoup4",
   "pillow",
