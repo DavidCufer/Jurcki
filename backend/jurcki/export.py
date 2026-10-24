@@ -232,7 +232,10 @@ def _num(v, digits=3):
 
 def hotspots_geojson(score, habitat, trigger, elev=None, mask=None, **kw) -> dict:
     """Hotspot FeatureCollection (sorted by descending score)."""
-    cells = pick_hotspots(score, mask, **kw)
+    # score saturates at 1 on the best days; break ties by the unclipped
+    # habitat x trigger product instead of by grid position
+    rank = np.asarray(score, float) + 1e-3 * np.nan_to_num(np.asarray(habitat) * np.asarray(trigger))
+    cells = pick_hotspots(rank, mask, **kw)
     feats = []
     if cells:
         rc = np.array(cells)

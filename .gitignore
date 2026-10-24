@@ -3,6 +3,7 @@ data/raw/
 data/cache/
 data/interim/
 *.tif
+!data/processed/runtime/*.tif
 *.nc
 *.zarr/
 .venv/
@@ -17,3 +18,6 @@ android/local.properties
 *.apk
 data/processed/*.csv
 data/output/demo/
+# local runs of the daily job / backfills
+/out/
+data/output/backfill/

@@ -393,6 +393,13 @@ _OM_HOURLY_FORECAST = ["soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil
                        "relative_humidity_2m", "dew_point_2m", "snow_depth"]
 
 
+# The model only needs soil water / temperature and snow from the hourly block; leaving out
+# humidity keeps a call at <= 10 variables, i.e. the cheapest Open-Meteo quota weight.
+_OM_HOURLY_ARCHIVE_LEAN = ["soil_moisture_0_to_7cm", "soil_temperature_0_to_7cm", "snow_depth"]
+_OM_HOURLY_FORECAST_LEAN = ["soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm",
+                            "soil_temperature_0cm", "soil_temperature_6cm", "snow_depth"]
+
+
 def grid_points(res=0.1, bbox=BBOX_WGS84):
     """(lat, lon) points on a regular grid over the bbox (ERA5-Land: 0.1 deg)."""
     minx, miny, maxx, maxy = bbox
@@ -405,7 +412,10 @@ def _get_json(url, params):
     """GET with retries; Open-Meteo reports errors as ``{"error": true, "reason": ...}``."""
     for i in range(5):
         r = requests.get(url, params=params, timeout=120)
-        if r.status_code in (429, 500, 502, 503, 504):
+        if r.status_code == 429:   # per-minute quota: wait for the window to roll over
+            time.sleep(61)
+            continue
+        if r.status_code in (500, 502, 503, 504):
             time.sleep(10 * (i + 1))
             continue
         data = r.json()
@@ -435,7 +445,8 @@ def _om_frame(loc: dict, forecast: bool) -> pd.DataFrame:
         hourly["swvl1"] = hourly.soil_moisture_0_to_7cm
         hourly["stl1"] = hourly.soil_temperature_0_to_7cm
     hourly = hourly.rename(columns={"dew_point_2m": "dewpoint", "relative_humidity_2m": "rh"})
-    means = hourly[["swvl1", "stl1", "dewpoint", "rh", "snow_depth"]].astype(float)
+    # dewpoint / rh are absent from the lean requests -> NaN columns
+    means = hourly.reindex(columns=["swvl1", "stl1", "dewpoint", "rh", "snow_depth"]).astype(float)
     means = means.groupby(means.index.normalize()).mean()  # local-day means
     return out.join(means).reindex(columns=VARS).astype(float)
 
@@ -456,18 +467,36 @@ def _om_dataset(frames: dict, elev: dict) -> xr.Dataset:
     return _finish(ds, xr.DataArray(orog, coords={"lat": lats, "lon": lons}, dims=("lat", "lon")))
 
 
-def _om_fetch(url, points, params, forecast, batch=50) -> xr.Dataset:
-    """Query Open-Meteo for many points (comma-separated, ``batch`` per call)."""
+def _om_fetch(url, points, params, forecast, batch=50, elevations=None, lean=False,
+              pause=0.0) -> xr.Dataset:
+    """Query Open-Meteo for many points (comma-separated, ``batch`` per call).
+
+    ``elevations``: optional metres per point. Open-Meteo statistically downscales
+    temperature to a target elevation (default: its 90 m DEM at the point); passing
+    ``elevation`` makes the response valid for exactly that height, and the
+    ``elevation`` it echoes back is stored as the dataset ``orography``.
+    ``lean`` requests only the variables the model uses; ``pause`` seconds are slept
+    between calls (quota friendliness).
+    """
     frames: dict = {}
     elev: dict = {}
-    base = {"timezone": TZ, "daily": ",".join(_OM_DAILY),
-            "hourly": ",".join(_OM_HOURLY_FORECAST if forecast else _OM_HOURLY_ARCHIVE), **params}
+    if forecast:
+        hourly = _OM_HOURLY_FORECAST_LEAN if lean else _OM_HOURLY_FORECAST
+    else:
+        hourly = _OM_HOURLY_ARCHIVE_LEAN if lean else _OM_HOURLY_ARCHIVE
+    base = {"timezone": TZ, "daily": ",".join(_OM_DAILY), "hourly": ",".join(hourly), **params}
     for i in range(0, len(points), batch):
         pts = points[i:i + batch]
         q = {**base, "latitude": ",".join(str(p[0]) for p in pts),
              "longitude": ",".join(str(p[1]) for p in pts)}
+        if elevations is not None:
+            q["elevation"] = ",".join(f"{float(e):.0f}" for e in elevations[i:i + batch])
+        if i and pause:
+            time.sleep(pause)
         data = _get_json(url, q)
         locs = data if isinstance(data, list) else [data]
+        if len(locs) != len(pts):
+            raise RuntimeError(f"Open-Meteo returned {len(locs)} locations for {len(pts)} requested")
         for p, loc in zip(pts, locs):  # responses keep the request order
             f = _om_frame(loc, forecast)
             frames[p] = pd.concat([frames[p], f]) if p in frames else f
@@ -492,10 +521,15 @@ def fetch_openmeteo_archive(points, start, end, model="era5_land", batch=50) -> 
     return xr.concat(parts, "time") if len(parts) > 1 else parts[0]
 
 
-def fetch_openmeteo_forecast(points, past_days=7, forecast_days=16, batch=50) -> xr.Dataset:
-    """Recent days plus forecast from the Open-Meteo forecast API (best match)."""
+def fetch_openmeteo_forecast(points, past_days=7, forecast_days=16, batch=50, elevations=None,
+                             lean=False, pause=0.0) -> xr.Dataset:
+    """Recent days plus forecast from the Open-Meteo forecast API (best match).
+
+    ``forecast_days`` counts today, so ``forecast_days=7`` ends 6 days after today.
+    See ``_om_fetch`` for ``elevations`` / ``lean`` / ``pause``.
+    """
     params = {"past_days": past_days, "forecast_days": forecast_days}
-    return _om_fetch(OPENMETEO_FORECAST, list(points), params, True, batch)
+    return _om_fetch(OPENMETEO_FORECAST, list(points), params, True, batch, elevations, lean, pause)
 
 
 # --------------------------------------------------------------------------
