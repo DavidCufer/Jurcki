@@ -131,7 +131,12 @@ def iter_posts(f: Fetcher, boards=BOARDS, log=print) -> Iterator[dict]:
             def stale(p: Page, want=want) -> bool:
                 return p.ok and len(parse_topic(p.text, p.fetched_at)) < want
 
-            pg = f.get(_topic_url(tid, off), refetch_if=stale)
+            try:
+                pg = f.get(_topic_url(tid, off), refetch_if=stale)
+            except RuntimeError as e:   # persistent server error on one page: skip it
+                log(f"[gobe] skip topic {tid} page {k}: {e}")
+                k += 1
+                continue
             if not pg.ok:
                 break
             posts = parse_topic(pg.text, pg.fetched_at)
