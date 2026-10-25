@@ -82,6 +82,19 @@ def test_curated_regions_are_inside_slovenia_bbox_and_sane():
         assert must in names, must
 
 
+def test_field_report_gap_places_are_curated():
+    by = {c["name"]: c for c in CURATED}
+    for n in ("Smrekovec", "Resevna", "Košenjak", "Kobansko", "Sorško polje", "Jošt", "Uskovnica", "Murska šuma",
+              "Ljubljansko barje", "Istra", "Šumik", "Osankarica", "Črno jezero", "Klopni vrh"):
+        assert n in by, n
+        assert "estimated" in by[n]["basis"] or "GeoNames" in by[n]["basis"]
+    # coarse sanity: sub-areas of the Pohorje lie inside the Pohorje ellipse's bounding box, Jošt is above Kranj
+    for n in ("Šumik", "Osankarica", "Črno jezero", "Klopni vrh"):
+        assert 46.40 < by[n]["lat"] < 46.55 and 15.2 < by[n]["lon"] < 15.6 and by[n]["a_km"] <= 4
+    assert abs(by["Jošt"]["lat"] - 46.245) < 0.02 and abs(by["Jošt"]["lon"] - 14.30) < 0.02
+    assert by["Istra"]["lat"] < 45.7 and by["Ljubljansko barje"]["lat"] < 46.05
+
+
 def test_ellipse_polygon_closed_and_sized():
     ring = gazetteer.ellipse_polygon(46.0, 14.5, 10_000, 4_000, 90)
     assert ring[0] == ring[-1]

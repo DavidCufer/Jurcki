@@ -711,9 +711,9 @@ def rule_location(text: str, min_conf: float = LOC_MIN_CONF):
 
 _GEO_PREFIX = ("Bil sem v ", "Bil sem na ", "Bil sem pri ", "Bil sem v okolici ")
 # Places the labeller named that are missing from (or wrongly fuzzy-matched by) the gazetteer.  Sub-sites of
-# the Pohorje are mapped to the whole range (honest, coarse); 'Kope' and 'Kapla' to the gazetteer entries the forum means.
+# the Pohorje now have their own (small, approximate) curated ellipses; 'Kope' and 'Kapla' map to the gazetteer entries the forum means.
 LOC_ALIASES: dict[str, str] = {
-    r"sumik\w*": "Pohorje", r"klopn\w* vrh\w*": "Pohorje", r"osankaric\w*": "Pohorje", r"crn\w* jezer\w*": "Pohorje",
+    r"sumik\w*": "Šumik", r"klopn\w* vrh\w*": "Klopni vrh", r"osankaric\w*": "Osankarica", r"crn\w* jezer\w*": "Črno jezero",
     r"kop(?:e|ah|ami)\b": "Velika Kopa", r"kapl(?:a|e|i)\b": "Zgornja Kapla"}
 LABEL_LOC_MIN_CONF = 0.4        # a label-text place the matcher is less sure about than this is left without coordinates
 

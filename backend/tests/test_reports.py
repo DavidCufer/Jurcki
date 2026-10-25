@@ -143,9 +143,11 @@ def test_geocode_place_bare_name():
 
 
 def test_geocode_place_aliases():
-    m = R.geocode_place("Klopni vrh Šumik")          # missing from the gazetteer -> whole range, flagged
-    assert m is not None and m.name == "Pohorje" and "alias" in m.flags
-    assert R.geocode_place("Klopnim vrhom").name == "Pohorje"
+    m = R.geocode_place("Šumik")                      # Pohorje sub-areas have their own (small, approximate) ellipses
+    assert m is not None and m.name == "Šumik" and m.radius_m < 6000 and 46.3 < m.lat < 46.6
+    assert R.geocode_place("Klopnim vrhom").name == "Klopni vrh"
+    assert R.geocode_place("Osankarica").name == "Osankarica"
+    assert R.geocode_place("Črno jezero").name == "Črno jezero"
     k = R.geocode_place("Kope")                       # not the village 'Kopa' in the south
     assert k is not None and k.lat > 46.4
     assert R.geocode_place("Kapla").lat > 46.5
