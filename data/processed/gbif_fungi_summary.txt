@@ -1,0 +1,145 @@
+GBIF snapshot 2026-10-01; raw rows 94090
+rows after cleaning: 86732
+
+== year ==
+is_jurcki  jurcki  other
+date                    
+2010            5   1035
+2011            6   1452
+2012            7   2337
+2013            5   8068
+2014            9   7793
+2015            2   7196
+2016            3   7654
+2017            9   9916
+2018            8  10131
+2019           14   8152
+2020           38   3366
+2021            5   1809
+2022           30   3294
+2023           43   4336
+2024           35   3605
+2025           44   4241
+2026           25   2059
+
+== year_SI ==
+is_jurcki  jurcki  other
+date                    
+2010            0    159
+2011            0    290
+2012            1   1099
+2013            3   7388
+2014            0   5906
+2015            0   6219
+2016            0   6830
+2017            5   8993
+2018            0   8257
+2019            2    759
+2020            3    394
+2021            1    388
+2022            3    524
+2023           11   1071
+2024            9   1152
+2025           23   1708
+2026           10    614
+
+== country ==
+                 n
+countrycode       
+SI           51822
+AT           27337
+HR            6321
+HU             891
+IT             359
+FI               1
+FR               1
+
+== month ==
+is_jurcki  jurcki  other
+date                    
+1               0   6409
+2               0   5944
+3               0   8810
+4               3   7623
+5               8   4724
+6              45   4935
+7              31   5846
+8              55   8026
+9              86  10396
+10             51  12178
+11              8   6871
+12              1   4682
+
+== dataset ==
+                                          n  n_jurcki  n_recorders                                               title
+datasetkey                                                                                                            
+ebf3c079-f88e-4b85-bcc5-f568229e68f3  45084         0          121                                                    
+50c9509d-22c7-4a22-a47d-8c48425ef4a7  17339       195         1460             iNaturalist Research-grade Observations
+71d34a18-4dad-4d2d-9cb3-c1e91317faad  12634        81          121                                                    
+935c81fd-2a50-4c1c-b747-50369ffd20a3   6375         0            0                                                    
+8a863029-f435-446a-821e-275f4f641165   1009         6          404  Observation.org, Nature data from around the World
+55b9ac33-0532-46d3-9796-c4c157f2b097    873         0          300                                                    
+fb8ae15d-e30c-44b4-8f61-0bb0c1d90ff9    641         0          614                                                    
+d714382d-5890-4234-ae81-696eeb53658a    579         0           13                                                    
+5830fa3c-497c-4d37-b771-bd6c84997f2c    529         0           78                                                    
+bd14614c-4d72-4763-8710-1cea514311cc    467         0            4                                                    
+c1492854-5d15-40e9-9ee7-24a18ac05112    272         4           11                                                    
+6ac3f774-d9fb-4796-b3e9-92bf6c81c084    171         2           22                                                    
+828a3d8c-f762-11e1-a439-00145eb45e9a    150         0            0                                                    
+7a2660bc-f762-11e1-a439-00145eb45e9a     93         0            1                                                    
+393b8c26-e4e0-4dd0-a218-93fc074ebf4e     74         0            8                                                    
+0f83123f-0c04-4556-8f4d-5a4e2a9bac66     67         0            3                                                    
+84d26682-f762-11e1-a439-00145eb45e9a     42         0            7                                                    
+857bce66-f762-11e1-a439-00145eb45e9a     40         0            8                                                    
+0b0735e0-624d-4abb-abba-91a2733adea4     34         0            2                                                    
+a7ef675a-9851-4919-ac77-a0f956e70d2b     30         0            3                                                    
+61a9ca38-b62f-11e2-afcb-00145eb45e9a     23         0            1                                                    
+e3ce628e-9683-4af7-b7a9-47eef785d3bb     20         0            3                                                    
+ceff8c75-950b-4405-a116-60247d1adacb     19         0            1                                                    
+c1a13bf0-0c71-11dd-84d4-b8a03c50a862     14         0            6                                                    
+d1a3b128-b406-46bb-a6d1-f3591dcc8a7b     13         0            6                                                    
+
+== top_species ==
+                              n
+species                        
+Cryphonectria parasitica  27870
+Hymenoscyphus fraxineus    9981
+Ophiostoma novo-ulmi       6204
+Trametes versicolor         674
+Fomitopsis pinicola         511
+Schizophyllum commune       448
+Eutypella parasitica        438
+Amanita muscaria            426
+Cronartium ribicola         360
+Fomes fomentarius           347
+Xanthoria parietina         337
+Amanita rubescens           313
+Flavoparmelia caperata      309
+Gloeophyllum odoratum       307
+Macrolepiota procera        299
+Coprinus comatus            299
+Fomitopsis betulina         292
+Stereum hirsutum            273
+Cantharellus cibarius       251
+Clathrus archeri            247
+Trametes gibbosa            245
+Trametes hirsuta            240
+Hypholoma fasciculare       236
+Clitocybe nebularis         228
+Mucidula mucida             219
+Calocera viscosa            214
+Lycoperdon perlatum         209
+Pseudohydnum gelatinosum    207
+Tapinella atrotomentosa     205
+Laetiporus sulphureus       198
+
+== basisofrecord ==
+                         n
+basisofrecord             
+OBSERVATION          45084
+HUMAN_OBSERVATION    32004
+MATERIAL_SAMPLE       6927
+PRESERVED_SPECIMEN    2707
+MATERIAL_CITATION        6
+MACHINE_OBSERVATION      2
+OCCURRENCE               2
