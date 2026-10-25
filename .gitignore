@@ -21,3 +21,6 @@ data/output/demo/
 # local runs of the daily job / backfills
 /out/
 data/output/backfill/
+# scraped third-party text stays local; only derived labels are committed
+data/processed/web_posts.parquet
+data/processed/web_news.parquet
