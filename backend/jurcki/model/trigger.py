@@ -160,10 +160,35 @@ def season_scores(panel: Panel) -> np.ndarray:
     return table[months - 1]
 
 
-def trigger_scores(panel: Panel, p: prior.PriorParams) -> np.ndarray:
-    """``prior.trigger_score`` of the panel's weather, (T, N)."""
+# Experimental, OFF by default (see docs/TRENDS.md): among macrofungi records, jurcki are over-represented at
+# high elevation late in the season and at low elevation early (odds x exp(b * z_elev * z_doy)). The constants
+# come from the target-group logistic regression of model.effort (Slovenia + Austria cell-days, 2010-2026).
+ELEV_SEASON = {"b": 0.525, "elev_mean": 567.2, "elev_sd": 292.7, "doy_mean": 240.2, "doy_sd": 52.2,
+               "clip": (0.5, 2.0)}
+
+
+def elev_season_factor(elev, doy, spec: dict = ELEV_SEASON) -> np.ndarray:
+    """Multiplier from the elevation x day-of-year interaction (1 at the mean elevation / mean date).
+
+    ``elev`` (m) and ``doy`` broadcast against each other; the result is clipped to ``spec["clip"]``.
+    """
+    ze = (np.asarray(elev, float) - spec["elev_mean"]) / spec["elev_sd"]
+    zd = (np.asarray(doy, float) - spec["doy_mean"]) / spec["doy_sd"]
+    return np.clip(np.exp(spec["b"] * ze * zd), *spec["clip"])
+
+
+def trigger_scores(panel: Panel, p: prior.PriorParams, elev_season: bool = False) -> np.ndarray:
+    """``prior.trigger_score`` of the panel's weather, (T, N).
+
+    ``elev_season=True`` multiplies it by ``elev_season_factor`` of each series' elevation
+    and the date (experimental; the default model is unchanged).
+    """
     w = panel.weather
-    return prior.trigger_score(prior.weather_features(w["tmean"], w["tmin"], w["tmax"], w["precip"], p), p)
+    score = prior.trigger_score(prior.weather_features(w["tmean"], w["tmin"], w["tmax"], w["precip"], p), p)
+    if elev_season:
+        doy = pd.DatetimeIndex(panel.dates.ravel()).day_of_year.to_numpy().reshape(panel.dates.shape)
+        score = score * elev_season_factor(panel.series["elev"].to_numpy(float)[None, :], doy)
+    return score
 
 
 def percentiles(panel: Panel, score: np.ndarray, tol: int = 0, matched: bool = False,
